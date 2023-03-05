@@ -1,6 +1,7 @@
 import React from 'react';
 import {useCallback} from 'react';
 import {StyleSheet, View} from 'react-native';
+import {useRoute} from '@react-navigation/native';
 
 import {AddCubbyForm} from '../components/AddCubbyForm';
 import {IntroText} from '../components/IntroText';
@@ -9,22 +10,15 @@ import CubbyList from '../components/CubbyList';
 import {Cubby} from '../models/Cubby';
 import {Section} from '../models/Section';
 
-// import { useUser } from "@realm/react"; //TODO: Enable for Sync
+import {HomeScreenNavigationProp} from '../navigation/types';
+import {HomeScreenRouteProp} from '../navigation/types';
 import {RealmContext} from '../models';
-// import {RootStackParamList} from './Types';
-// import {NativeStackScreenProps} from '@react-navigation/native-stack';
 
 const {useRealm} = RealmContext;
 
-type CubbyManagerProps = {
-  cubbies: Realm.Results<Cubby & Realm.Object>;
-  // navigationProps: NativeStackScreenProps<RootStackParamList, 'CubbyManager'>;
-};
-
-export const CubbyManager: React.FC<CubbyManagerProps> = ({
-  cubbies,
-  // navigationProps,
-}) => {
+export const CubbyManager: React.FC<HomeScreenNavigationProp> = () => {
+  const route = useRoute<HomeScreenRouteProp>();
+  const {cubbies} = route.params;
   const realm = useRealm();
 
   const handleAddCubby = useCallback(

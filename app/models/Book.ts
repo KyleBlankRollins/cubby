@@ -18,7 +18,7 @@ export class Book extends Realm.Object<Book> {
   notes!: string;
   cover!: object;
   // publishDate!: date;
-  // dentifiers!: object;
+  // identifiers!: object;
   subjects!: Realm.List<Subject>;
   tableOfContents!: Realm.List<TableOfContents>;
   link!: Realm.List<Link>;
@@ -35,7 +35,7 @@ export class Book extends Realm.Object<Book> {
     name: 'Book',
     properties: {
       _id: 'objectId',
-      // userId: 'string',
+      userId: 'string',
       url: 'string',
       key: 'string',
       title: 'string',

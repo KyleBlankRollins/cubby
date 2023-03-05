@@ -1,6 +1,7 @@
 import React from 'react';
 import Realm from 'realm';
 import {View, Text, Pressable, StyleSheet} from 'react-native';
+import {useNavigation} from '@react-navigation/native';
 
 import {shadows} from '../styles/shadows';
 import colors from '../styles/colors';
@@ -13,35 +14,42 @@ type CubbyOverviewProps = {
 
 export const CubbyOverview = React.memo<CubbyOverviewProps>(
   ({cubby, onDelete}) => {
+    const navigation = useNavigation();
+
     return (
       // TODO: Change this to <Pressable> and navigate to cubby view on press.
       <View style={styles.cubby}>
-        {/* <Pressable
-          onPress={onToggleStatus}
-          style={[styles.status, task.isComplete && styles.completed]}>
-          <Text style={styles.icon}>{task.isComplete ? '✓' : '○'}</Text>
-        </Pressable> */}
-        <View style={styles.overviewContainer}>
-          <View style={styles.nameContainer}>
-            <Text numberOfLines={1} style={styles.name}>
-              {cubby.name}
-            </Text>
+        <Pressable
+          onPress={() => {
+            navigation.navigate('Cubby', {
+              name: cubby.name,
+              books: cubby.sections,
+            });
+          }}>
+          <View style={styles.overviewContainer}>
+            <View style={styles.nameContainer}>
+              <Text numberOfLines={1} style={styles.name}>
+                {cubby.name}
+              </Text>
+            </View>
+            <View style={styles.descriptionContainer}>
+              <Text numberOfLines={1} style={styles.description}>
+                {cubby.description}
+              </Text>
+            </View>
           </View>
-          <View style={styles.descriptionContainer}>
-            <Text numberOfLines={1} style={styles.description}>
-              {cubby.description}
-            </Text>
+          <View style={styles.infoContainer}>
+            <View style={styles.books}>
+              {/* <Text style={styles.bookText}> {cubby.books.length} books </Text> */}
+              {/* TODO: Need a total number of books from all sections */}
+              <Text># Books</Text>
+            </View>
+            {/* TODO: Move delete functionality to Cubby view */}
+            <Pressable onPress={onDelete} style={styles.deleteButton}>
+              <Text style={styles.deleteText}>Delete</Text>
+            </Pressable>
           </View>
-        </View>
-        <View style={styles.infoContainer}>
-          <View style={styles.books}>
-            <Text style={styles.bookText}> {cubby.books.length} books </Text>
-          </View>
-          {/* TODO: Move delete functionality to Cubby view */}
-          <Pressable onPress={onDelete} style={styles.deleteButton}>
-            <Text style={styles.deleteText}>Delete</Text>
-          </Pressable>
-        </View>
+        </Pressable>
       </View>
     );
   },
