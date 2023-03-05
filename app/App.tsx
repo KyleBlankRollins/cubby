@@ -1,31 +1,29 @@
-import React, {useMemo} from 'react';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
-
-import {RootStackParamList} from './Types';
-import {Cubby} from './models/Cubby';
+import React from 'react';
+import {SafeAreaView, StyleSheet, StatusBar} from 'react-native';
 import {RealmContext} from './models';
+import colors from './styles/colors';
 
-import {CubbyManager} from './components/CubbyManager';
+import RootNavigator from './navigation';
+const {RealmProvider} = RealmContext;
 
-const Stack = createNativeStackNavigator<RootStackParamList>();
-
-const {useQuery} = RealmContext;
-
-export const App = () => {
-  const result = useQuery(Cubby);
-
-  const cubbies = useMemo(() => result.sorted('name'), [result]);
-
+export const App = (): JSX.Element => {
   return (
-    // <CubbyManager cubbies={cubbies} />
-    <Stack.Navigator initialRouteName="CubbyManager">
-      <Stack.Screen
-        name="CubbyManager"
-        component={CubbyManager} // TODO: Figure out how to pass .tsx component here
-        options={{title: 'Welcome'}}
-        initialParams={{cubby: cubbies}}
-      />
-      {/* <Stack.Screen name="Profile" component={ProfileScreen} /> */}
-    </Stack.Navigator>
+    <>
+      <SafeAreaView style={styles.screen}>
+        <RealmProvider>
+          <RootNavigator />
+        </RealmProvider>
+
+        {/* TODO: update for dynamic theme */}
+        <StatusBar barStyle={'light-content'} />
+      </SafeAreaView>
+    </>
   );
 };
+
+const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+    backgroundColor: colors.darkBlue,
+  },
+});

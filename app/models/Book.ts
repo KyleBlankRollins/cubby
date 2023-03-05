@@ -35,7 +35,7 @@ export class Book extends Realm.Object<Book> {
     name: 'Book',
     properties: {
       _id: 'objectId',
-      owner_id: 'string',
+      // userId: 'string',
       url: 'string',
       key: 'string',
       title: 'string',

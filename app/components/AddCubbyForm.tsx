@@ -22,6 +22,8 @@ export const AddCubbyForm: React.FC<AddCubbyFormProps> = ({onSubmit}) => {
 
   const handleSubmit = () => {
     onSubmit(description, name);
+
+    // Reset state
     setDescription('');
     setName('');
   };

@@ -1,30 +1,30 @@
-import React from '@realm/react';
-import {useState, useCallback} from 'react';
-import {StyleSheet, Text, TextInput, View} from 'react-native';
+import React from 'react';
+import {useCallback} from 'react';
+import {StyleSheet, View} from 'react-native';
 
-import {AddCubbyForm} from './AddCubbyForm';
-import {IntroText} from './IntroText';
-import CubbyList from './CubbyList';
+import {AddCubbyForm} from '../components/AddCubbyForm';
+import {IntroText} from '../components/IntroText';
+import CubbyList from '../components/CubbyList';
 
-import {RootStackParamList} from './Types';
 import {Cubby} from '../models/Cubby';
 import {Section} from '../models/Section';
-import {Book} from '../models/Book';
 
 // import { useUser } from "@realm/react"; //TODO: Enable for Sync
 import {RealmContext} from '../models';
-import {NativeStackScreenProps} from '@react-navigation/native-stack';
+// import {RootStackParamList} from './Types';
+// import {NativeStackScreenProps} from '@react-navigation/native-stack';
 
 const {useRealm} = RealmContext;
 
 type CubbyManagerProps = {
   cubbies: Realm.Results<Cubby & Realm.Object>;
-  navigationProps: NativeStackScreenProps<RootStackParamList, 'CubbyManager'>;
-  userId?: string;
+  // navigationProps: NativeStackScreenProps<RootStackParamList, 'CubbyManager'>;
 };
 
-export const CubbyManager: React.FC<CubbyManagerProps> = props => {
-  // const user = useUser(); //TODO: Enable for Sync
+export const CubbyManager: React.FC<CubbyManagerProps> = ({
+  cubbies,
+  // navigationProps,
+}) => {
   const realm = useRealm();
 
   const handleAddCubby = useCallback(
@@ -34,19 +34,21 @@ export const CubbyManager: React.FC<CubbyManagerProps> = props => {
       }
 
       realm.write(() => {
-        // const defaultSection = new Section(
-        // 	realm,
-        // 	name = "First section",
-        // );
+        const defaultSection: Section = realm.create('Section', {
+          name: 'First section',
+        });
 
-        const newCubby = new Cubby(realm, name, description, props.userId);
+        const newCubby: Cubby = realm.create('Cubby', {
+          name,
+          description,
+        });
 
-        // newCubby.sections.push(defaultSection);
+        newCubby.sections.push(defaultSection);
 
         return newCubby;
       });
     },
-    [realm, props.userId],
+    [realm],
   );
 
   // TODO: Show a confirm delete modal before deleting
@@ -61,10 +63,10 @@ export const CubbyManager: React.FC<CubbyManagerProps> = props => {
 
   return (
     <View style={styles.container}>
-      {!props.cubbies ? (
+      {!cubbies ? (
         <IntroText />
       ) : (
-        <CubbyList cubbies={props.cubbies} onDeleteCubby={handleDeleteCubby} />
+        <CubbyList cubbies={cubbies} onDeleteCubby={handleDeleteCubby} />
       )}
       {/* TODO: Don't show this all the time */}
       <AddCubbyForm onSubmit={handleAddCubby} />

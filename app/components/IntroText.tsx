@@ -33,7 +33,7 @@ const styles = StyleSheet.create({
   paragraph: {
     marginVertical: 10,
     textAlign: 'center',
-    color: 'white',
+    color: colors.darkBlue,
     fontSize: 17,
     fontWeight: '500',
   },
