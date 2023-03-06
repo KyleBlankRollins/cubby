@@ -16,8 +16,6 @@ export const CubbyOverview = React.memo<CubbyOverviewProps>(
   ({cubby, onDelete}) => {
     const navigation = useNavigation();
 
-    console.log(cubby.name)
-
     return (
       // TODO: Change this to <Pressable> and navigate to cubby view on press.
       <View style={styles.cubby}>

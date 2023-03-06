@@ -14,11 +14,6 @@ const HomeStack = createNativeStackNavigator<HomeStackNavigatorParamList>();
 const HomeStackNavigator = () => {
   const result = useQuery(Cubby);
   const cubbies = useMemo(() => result.sorted('name'), [result]);
-  let defaultCubby: Realm.BSON.ObjectId;
-
-  if (cubbies && cubbies.length) {
-    defaultCubby = cubbies[0]._id;
-  }
 
   return (
     <HomeStack.Navigator initialRouteName="CubbyManager">
@@ -30,9 +25,8 @@ const HomeStackNavigator = () => {
       />
       <HomeStack.Screen
         name="CubbyScreen"
-        component={CubbyScreen}
-        options={{title: 'Cubby'}} // TODO: Need global stat for active cubby. Use its title here.
-        initialParams={{_id: defaultCubby}}
+        component={CubbyScreen} // TODO: Figure out why TS is mad
+        options={{title: 'Cubby'}} // TODO: Need global state for active cubby. Use its title here.
       />
     </HomeStack.Navigator>
   );

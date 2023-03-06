@@ -28,14 +28,18 @@ export const CubbyManager: React.FC<HomeScreenNavigationProp> = () => {
       }
 
       realm.write(() => {
-        const defaultSection: Section = realm.create('Section', {
-          name: 'First section',
-        });
+        const defaultSection: Section = realm.create(
+          'Section',
+          Section.generate('default section', {
+            main: '#DDD382',
+            highlight: '#D65F28',
+          }),
+        );
 
-        const newCubby: Cubby = realm.create('Cubby', {
-          name,
-          description,
-        });
+        const newCubby: Cubby = realm.create(
+          'Cubby',
+          Cubby.generate(name, description),
+        );
 
         newCubby.sections.push(defaultSection);
 
@@ -57,7 +61,7 @@ export const CubbyManager: React.FC<HomeScreenNavigationProp> = () => {
 
   return (
     <View style={styles.container}>
-      {!cubbies ? (
+      {!cubbies || !cubbies.length ? (
         <IntroText />
       ) : (
         <CubbyList cubbies={cubbies} onDeleteCubby={handleDeleteCubby} />

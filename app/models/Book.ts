@@ -1,5 +1,4 @@
 import {Realm} from '@realm/react';
-import {Cubby} from './Cubby';
 import {
   Author,
   Link,
@@ -17,25 +16,18 @@ export class Book extends Realm.Object<Book> {
   numberOfPages!: number;
   notes!: string;
   cover!: object;
-  // publishDate!: date;
-  // identifiers!: object;
   subjects!: Realm.List<Subject>;
   tableOfContents!: Realm.List<TableOfContents>;
-  link!: Realm.List<Link>;
-  publisher!: Realm.List<Publisher>;
+  links!: Realm.List<Link>;
+  publishers!: Realm.List<Publisher>;
   authors!: Realm.List<Author>;
-  userId!: string;
-  assignee!: {
-    type: 'linkingObjects';
-    objectType: Cubby;
-    property: 'books';
-  };
+  userId?: Realm.BSON.ObjectId;
 
   static schema = {
     name: 'Book',
     properties: {
       _id: 'objectId',
-      userId: 'string',
+      userId: 'string?',
       url: 'string',
       key: 'string',
       title: 'string',
@@ -58,4 +50,39 @@ export class Book extends Realm.Object<Book> {
     },
     primaryKey: '_id',
   };
+
+  static generate(
+    bookInfo: {
+      url: string;
+      key: string;
+      title: string;
+      subtitle: string;
+      number_of_pages: number;
+      notes: string;
+      cover: object;
+      subjects: Realm.List<Subject>;
+      table_of_contents: Realm.List<TableOfContents>;
+      links: Realm.List<Link>;
+      publishers: Realm.List<Publisher>;
+      authors: Realm.List<Author>;
+    },
+    userId?: Realm.BSON.ObjectId | undefined,
+  ) {
+    return {
+      _id: new Realm.BSON.ObjectId(),
+      userId: userId,
+      url: bookInfo.url,
+      key: bookInfo.key,
+      title: bookInfo.title,
+      subtitle: bookInfo.subtitle ? bookInfo.subtitle : '',
+      numberOfPages: bookInfo.number_of_pages,
+      cover: bookInfo.cover,
+      subjects: bookInfo.subjects,
+      notes: bookInfo.notes ? bookInfo.notes : '',
+      tableOfContents: bookInfo.table_of_contents,
+      links: bookInfo.links,
+      publishers: bookInfo.publishers,
+      authors: bookInfo.authors,
+    };
+  }
 }

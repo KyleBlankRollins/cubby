@@ -1,24 +1,18 @@
 import {Realm} from '@realm/react';
 import {Book} from './Book';
-import {Cubby} from './Cubby';
 
 export class Section extends Realm.Object<Section> {
   _id: Realm.BSON.ObjectId = new Realm.BSON.ObjectId();
-  userId!: string;
   name!: string;
   books!: Realm.List<Book>;
   colors!: object;
-  assignee!: {
-    type: 'linkingObjects';
-    objectType: Cubby;
-    property: 'sections';
-  };
+  userId?: Realm.BSON.ObjectId;
 
   static schema = {
     name: 'Section',
     properties: {
       _id: 'objectId',
-      userId: 'string',
+      userId: 'string?',
       name: 'string',
       books: 'Book[]',
       colors: '{}',
@@ -30,4 +24,20 @@ export class Section extends Realm.Object<Section> {
     },
     primaryKey: '_id',
   };
+
+  static generate(
+    name: string,
+    colors: {
+      main: string;
+      highlight: string;
+    },
+    userId?: Realm.BSON.ObjectId | undefined,
+  ) {
+    return {
+      _id: new Realm.BSON.ObjectId(),
+      name,
+      colors,
+      userId,
+    };
+  }
 }
