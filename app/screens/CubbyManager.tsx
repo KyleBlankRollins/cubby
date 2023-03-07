@@ -1,10 +1,11 @@
-import React, {useMemo} from 'react';
+import React, {useMemo, useState} from 'react';
 import {useCallback} from 'react';
 import {StyleSheet, View} from 'react-native';
 
 import {AddCubbyForm} from '../components/AddCubbyForm';
 import {IntroText} from '../components/IntroText';
 import CubbyList from '../components/CubbyList';
+import {AppButton} from '../components/AppButton';
 
 import {Cubby} from '../models/Cubby';
 import {Section} from '../models/Section';
@@ -20,6 +21,8 @@ export const CubbyManager: React.FC<HomeScreenNavigationProp> = () => {
   // TODO: Consider passing just an array to the CubbyList.
   // Possibly no need for the actual objects in the list.
   const cubbies = useMemo(() => result.sorted('name'), [result]);
+  const [cubbyFormVisible, setCubbyFormVisible] = useState(false);
+  const [opacityLevel, setOpacityLevel] = useState(1);
 
   const handleAddCubby = useCallback(
     (description: string, name: string): void => {
@@ -43,6 +46,8 @@ export const CubbyManager: React.FC<HomeScreenNavigationProp> = () => {
 
         newCubby.sections.push(defaultSection);
 
+        handleModalClose();
+
         return newCubby;
       });
     },
@@ -59,15 +64,37 @@ export const CubbyManager: React.FC<HomeScreenNavigationProp> = () => {
     [realm],
   );
 
+  const handleModalClose = () => {
+    setCubbyFormVisible(false);
+    setOpacityLevel(1);
+  };
+
+  const handleModalOpacity = () => {
+    return {
+      opacity: opacityLevel,
+    };
+  };
+
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, handleModalOpacity()]}>
       {!cubbies || !cubbies.length ? (
         <IntroText />
       ) : (
         <CubbyList cubbies={cubbies} onDeleteCubby={handleDeleteCubby} />
       )}
       {/* TODO: Don't show this all the time */}
-      <AddCubbyForm onSubmit={handleAddCubby} />
+      <AppButton
+        onPress={() => {
+          setCubbyFormVisible(true);
+          setOpacityLevel(0.25);
+        }}
+        title="Add Cubby"
+      />
+      <AddCubbyForm
+        onSubmit={handleAddCubby}
+        onClose={handleModalClose}
+        visible={cubbyFormVisible}
+      />
     </View>
   );
 };

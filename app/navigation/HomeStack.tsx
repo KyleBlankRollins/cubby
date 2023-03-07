@@ -5,6 +5,7 @@ import {CubbyManager} from '../screens/CubbyManager';
 import CubbyScreen from '../screens/CubbyScreen';
 
 import {HomeStackNavigatorParamList} from './types';
+import {AddCubbyForm} from '../components/AddCubbyForm';
 
 const HomeStack = createNativeStackNavigator<HomeStackNavigatorParamList>();
 
@@ -22,6 +23,18 @@ const HomeStackNavigator = () => {
         options={({route}) => ({
           title: route.params.name,
         })}
+      />
+      <HomeStack.Screen
+        name="AddCubbyModal"
+        component={AddCubbyForm} // TODO: Figure out why TS is mad
+        options={{
+          presentation: 'modal',
+          headerShown: false,
+          contentStyle: {
+            backgroundColor: 'transparent',
+            opacity: 0.99,
+          },
+        }}
       />
     </HomeStack.Navigator>
   );

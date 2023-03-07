@@ -10,6 +10,7 @@ export type HomeStackNavigatorParamList = {
     _id: string;
     name: string;
   };
+  AddCubbyModal: {};
 };
 
 export type BottomTabNavigatorParamList = {

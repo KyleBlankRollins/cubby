@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import {
+  Modal,
   View,
   Text,
   TextInput,
@@ -15,9 +16,15 @@ import {lightStyles, darkStyles} from '../styles/theme';
 
 type AddCubbyFormProps = {
   onSubmit: (description: string, name: string) => void;
+  onClose: () => void;
+  visible: boolean;
 };
 
-export const AddCubbyForm: React.FC<AddCubbyFormProps> = ({onSubmit}) => {
+export const AddCubbyForm: React.FC<AddCubbyFormProps> = ({
+  onSubmit,
+  onClose,
+  visible,
+}) => {
   const [description, setDescription] = useState('');
   const [name, setName] = useState('');
 
@@ -32,45 +39,70 @@ export const AddCubbyForm: React.FC<AddCubbyFormProps> = ({onSubmit}) => {
     setName('');
   };
 
+  const handleClose = () => {
+    onClose();
+  };
+
   return (
-    <View style={styles.form}>
-      <View style={styles.inputs}>
-        <TextInput
-          value={name}
-          placeholder="Cubby name"
-          // placeholderTextColor={colors.darkBlue}
-          onChangeText={setName}
-          autoCorrect={false}
-          autoCapitalize="none"
-          style={[styles.textInput, styles.textInputName, themeStyles.surface3]}
-        />
-        <TextInput
-          value={description}
-          placeholder="Cubby description"
-          // placeholderTextColor={colors.darkBlue}
-          onChangeText={setDescription}
-          autoCorrect={false}
-          autoCapitalize="none"
-          style={[
-            styles.textInput,
-            styles.textInputDescription,
-            themeStyles.surface3,
-          ]}
-        />
+    <Modal
+      visible={visible}
+      transparent={true}
+      animationType={'fade'}
+      onRequestClose={() => {
+        handleClose();
+      }}>
+      <View style={[styles.form, themeStyles.surface2]}>
+        <View style={styles.inputs}>
+          <TextInput
+            value={name}
+            placeholder="Cubby name"
+            // placeholderTextColor={colors.darkBlue}
+            onChangeText={setName}
+            autoCorrect={false}
+            autoCapitalize="none"
+            style={[
+              styles.textInput,
+              styles.textInputName,
+              themeStyles.surface3,
+            ]}
+          />
+          <TextInput
+            value={description}
+            placeholder="Cubby description"
+            // placeholderTextColor={colors.darkBlue}
+            onChangeText={setDescription}
+            autoCorrect={false}
+            autoCapitalize="none"
+            style={[
+              styles.textInput,
+              styles.textInputDescription,
+              themeStyles.surface3,
+            ]}
+          />
+        </View>
+        <View style={styles.verticalButtonGroup}>
+          <Pressable onPress={handleSubmit} style={styles.submit}>
+            <Text style={styles.icon}>＋</Text>
+          </Pressable>
+          <Pressable onPress={handleClose} style={styles.submit}>
+            <Text style={styles.icon}>X</Text>
+          </Pressable>
+        </View>
       </View>
-      <Pressable onPress={handleSubmit} style={styles.submit}>
-        <Text style={styles.icon}>＋</Text>
-      </Pressable>
-    </View>
+    </Modal>
   );
 };
 
 const styles = StyleSheet.create({
   form: {
-    flex: 0.25,
-    marginVertical: 10,
-    marginHorizontal: 5,
     flexDirection: 'row',
+    height: 150,
+    width: '100%',
+    position: 'absolute',
+    bottom: '40%',
+    right: 0,
+    paddingVertical: 8,
+    paddingHorizontal: 4,
     // ...shadows,
   },
   inputs: {
@@ -92,13 +124,18 @@ const styles = StyleSheet.create({
   submit: {
     ...buttonStyles.button,
     width: 50,
-    height: '100%',
+    height: '50%',
     paddingHorizontal: 0,
     paddingVertical: 0,
+    marginVertical: 2,
     marginLeft: 10,
     marginRight: 0,
   },
   icon: {
     ...buttonStyles.text,
+  },
+  verticalButtonGroup: {
+    justifyContent: 'center',
+    // marginVertical: 8,
   },
 });
