@@ -7,7 +7,8 @@ export type HomeStackNavigatorParamList = {
     cubbies: Realm.Results<Cubby & Realm.Object>;
   };
   CubbyScreen: {
-    _id: Realm.BSON.ObjectId;
+    _id: string;
+    name: string;
   };
 };
 
@@ -21,10 +22,10 @@ export type CubbyScreenNavigationProp = NativeStackNavigationProp<
   'CubbyManager' // All route possibilities for CubbyManager. Undefined means access to all routes.
 >;
 
-export type HomeScreenRouteProp = RouteProp<
-  HomeStackNavigatorParamList,
-  'CubbyManager'
->;
+// export type HomeScreenRouteProp = RouteProp<
+//   HomeStackNavigatorParamList,
+//   'CubbyManager'
+// >;
 
 export type CubbyScreenRouteProp = RouteProp<
   HomeStackNavigatorParamList,

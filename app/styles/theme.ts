@@ -84,7 +84,7 @@ const lightStyles = StyleSheet.create({
 const darkStyles = StyleSheet.create({
   surface1: {
     backgroundColor: dark.surface1,
-    color: dark.text,
+    color: dark.text2,
   },
   surface2: {
     backgroundColor: dark.surface2,
@@ -100,4 +100,4 @@ const darkStyles = StyleSheet.create({
   },
 });
 
-export default {light, lightStyles, dark, darkStyles};
+export {light, lightStyles, dark, darkStyles};

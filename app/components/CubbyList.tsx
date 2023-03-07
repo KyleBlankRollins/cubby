@@ -1,8 +1,7 @@
 import React from 'react';
-import {View, Text, FlatList, StyleSheet} from 'react-native';
+import {View, FlatList, StyleSheet} from 'react-native';
 import {Realm} from '@realm/react';
 
-import colors from '../styles/colors';
 import {Cubby} from '../models/Cubby';
 import {CubbyOverview} from './CubbyOverview';
 
@@ -12,15 +11,15 @@ type CubbyListProps = {
 };
 
 const CubbyList: React.FC<CubbyListProps> = ({cubbies, onDeleteCubby}) => {
+  // Note: Hack to work around FlatList not currently
+  // accepting Realm.Results. https://github.com/facebook/react-native/commit/d574ea3526e713eae2c6e20c7a68fa66ff4ad7d2
+  const FlatListArray = Array.from(cubbies);
+
   return (
     <View style={styles.listContainer}>
-      <Text style={styles.paragraph}>Cubby List</Text>
-      <Text style={styles.paragraph}>{cubbies.length}</Text>
-      <Text style={styles.paragraph}>{cubbies[0]._id.toHexString()}</Text>
-      {/* PICK UP HERE: why doesn't FlatList seem to work? */}
       <FlatList
-        data={cubbies}
-        keyExtractor={cubby => cubby._id.toHexString()}
+        data={FlatListArray}
+        keyExtractor={cubby => cubby._id.toString()}
         renderItem={({item}) => (
           <CubbyOverview cubby={item} onDelete={() => onDeleteCubby(item)} />
         )}
@@ -33,13 +32,6 @@ const styles = StyleSheet.create({
   listContainer: {
     flex: 1,
     justifyContent: 'center',
-  },
-  paragraph: {
-    marginVertical: 10,
-    textAlign: 'center',
-    color: colors.darkBlue,
-    fontSize: 17,
-    fontWeight: '500',
   },
 });
 

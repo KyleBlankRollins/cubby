@@ -1,7 +1,6 @@
-import React from 'react';
+import React, {useMemo} from 'react';
 import {useCallback} from 'react';
 import {StyleSheet, View} from 'react-native';
-import {useRoute} from '@react-navigation/native';
 
 import {AddCubbyForm} from '../components/AddCubbyForm';
 import {IntroText} from '../components/IntroText';
@@ -11,15 +10,16 @@ import {Cubby} from '../models/Cubby';
 import {Section} from '../models/Section';
 
 import {HomeScreenNavigationProp} from '../navigation/types';
-import {HomeScreenRouteProp} from '../navigation/types';
 import {RealmContext} from '../models';
 
-const {useRealm} = RealmContext;
+const {useRealm, useQuery} = RealmContext;
 
 export const CubbyManager: React.FC<HomeScreenNavigationProp> = () => {
-  const route = useRoute<HomeScreenRouteProp>();
-  const {cubbies} = route.params;
   const realm = useRealm();
+  const result = useQuery(Cubby);
+  // TODO: Consider passing just an array to the CubbyList.
+  // Possibly no need for the actual objects in the list.
+  const cubbies = useMemo(() => result.sorted('name'), [result]);
 
   const handleAddCubby = useCallback(
     (description: string, name: string): void => {

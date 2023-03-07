@@ -2,8 +2,9 @@ import React from 'react';
 import Realm from 'realm';
 import {View, Text, Pressable, StyleSheet} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
+import {HomeScreenNavigationProp} from '../navigation/types';
 
-import {shadows} from '../styles/shadows';
+// import {shadows} from '../styles/shadows';
 import colors from '../styles/colors';
 import {Cubby} from '../models/Cubby';
 
@@ -14,45 +15,40 @@ type CubbyOverviewProps = {
 
 export const CubbyOverview = React.memo<CubbyOverviewProps>(
   ({cubby, onDelete}) => {
-    const navigation = useNavigation();
-
-    console.log(cubby.name)
+    const navigation = useNavigation<HomeScreenNavigationProp>();
 
     return (
       // TODO: Change this to <Pressable> and navigate to cubby view on press.
-      <View style={styles.cubby}>
-        <Pressable
-          onPress={() => {
-            navigation.navigate('Cubby', {
-              name: cubby.name,
-              books: cubby.sections,
-            });
-          }}>
-          <View style={styles.overviewContainer}>
-            <View style={styles.nameContainer}>
-              <Text numberOfLines={1} style={styles.name}>
-                {cubby.name}
-              </Text>
-            </View>
-            <View style={styles.descriptionContainer}>
-              <Text numberOfLines={1} style={styles.description}>
-                {cubby.description}
-              </Text>
-            </View>
+      <Pressable
+        style={styles.cubby}
+        onPress={() =>
+          navigation.navigate('CubbyScreen', {
+            name: cubby.name,
+            _id: cubby._id.toString(),
+          })
+        }>
+        <View style={styles.overviewContainer}>
+          <View style={styles.nameContainer}>
+            <Text numberOfLines={1} style={styles.name}>
+              {cubby.name}
+            </Text>
           </View>
-          <View style={styles.infoContainer}>
-            <View style={styles.books}>
-              {/* <Text style={styles.bookText}> {cubby.books.length} books </Text> */}
-              {/* TODO: Need a total number of books from all sections */}
-              <Text># Books</Text>
-            </View>
-            {/* TODO: Move delete functionality to Cubby view */}
-            <Pressable onPress={onDelete} style={styles.deleteButton}>
-              <Text style={styles.deleteText}>Delete</Text>
-            </Pressable>
+          <View style={styles.descriptionContainer}>
+            <Text numberOfLines={1} style={styles.description}>
+              {cubby.description}
+            </Text>
           </View>
-        </Pressable>
-      </View>
+        </View>
+        <View style={styles.infoContainer}>
+          {/* <View style={styles.books}>
+            <Text style={styles.bookText}> {cubby.books.length} books </Text>
+          </View> */}
+          {/* TODO: Move delete functionality to Cubby view */}
+          {/* <Pressable onPress={onDelete} style={styles.deleteButton}>
+            <Text style={styles.deleteText}>Delete</Text>
+          </Pressable> */}
+        </View>
+      </Pressable>
     );
   },
 );
@@ -63,8 +59,7 @@ const styles = StyleSheet.create({
     alignSelf: 'stretch',
     flexDirection: 'row',
     marginVertical: 8,
-    backgroundColor: colors.white,
-    ...shadows,
+    // ...shadows,
   },
   overviewContainer: {
     flex: 1,
@@ -81,7 +76,6 @@ const styles = StyleSheet.create({
   },
   description: {
     paddingHorizontal: 10,
-    color: colors.black,
     fontSize: 17,
   },
   nameContainer: {
@@ -90,15 +84,11 @@ const styles = StyleSheet.create({
   },
   name: {
     paddingHorizontal: 10,
-    color: colors.black,
     fontSize: 25,
   },
   books: {
     flex: 0.25,
     justifyContent: 'center',
-  },
-  bookText: {
-    color: colors.black,
   },
   status: {
     width: 50,
@@ -106,10 +96,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderTopLeftRadius: 5,
     borderBottomLeftRadius: 5,
-    backgroundColor: colors.gray,
-  },
-  completed: {
-    backgroundColor: colors.purple,
   },
   deleteButton: {
     flex: 0.75,
@@ -118,11 +104,9 @@ const styles = StyleSheet.create({
   },
   deleteText: {
     marginHorizontal: 10,
-    color: colors.gray,
     fontSize: 17,
   },
   icon: {
-    color: colors.white,
     textAlign: 'center',
     fontSize: 17,
     fontWeight: 'bold',

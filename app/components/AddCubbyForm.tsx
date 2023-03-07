@@ -6,11 +6,13 @@ import {
   Pressable,
   Platform,
   StyleSheet,
+  useColorScheme,
 } from 'react-native';
 
 import {buttonStyles} from '../styles/button';
+import {lightStyles, darkStyles} from '../styles/theme';
 import colors from '../styles/colors';
-import {shadows} from '../styles/shadows';
+// import {shadows} from '../styles/shadows';
 
 type AddCubbyFormProps = {
   onSubmit: (description: string, name: string) => void;
@@ -19,6 +21,9 @@ type AddCubbyFormProps = {
 export const AddCubbyForm: React.FC<AddCubbyFormProps> = ({onSubmit}) => {
   const [description, setDescription] = useState('');
   const [name, setName] = useState('');
+
+  const isDarkMode = useColorScheme() === 'dark';
+  const themeStyles = isDarkMode ? darkStyles : lightStyles;
 
   const handleSubmit = () => {
     onSubmit(description, name);
@@ -34,20 +39,24 @@ export const AddCubbyForm: React.FC<AddCubbyFormProps> = ({onSubmit}) => {
         <TextInput
           value={name}
           placeholder="Cubby name"
-          placeholderTextColor={colors.darkBlue}
+          // placeholderTextColor={colors.darkBlue}
           onChangeText={setName}
           autoCorrect={false}
           autoCapitalize="none"
-          style={[styles.textInput, styles.textInputName]}
+          style={[styles.textInput, styles.textInputName, themeStyles.surface3]}
         />
         <TextInput
           value={description}
           placeholder="Cubby description"
-          placeholderTextColor={colors.darkBlue}
+          // placeholderTextColor={colors.darkBlue}
           onChangeText={setDescription}
           autoCorrect={false}
           autoCapitalize="none"
-          style={[styles.textInput, styles.textInputDescription]}
+          style={[
+            styles.textInput,
+            styles.textInputDescription,
+            themeStyles.surface3,
+          ]}
         />
       </View>
       <Pressable onPress={handleSubmit} style={styles.submit}>
@@ -63,7 +72,7 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     marginHorizontal: 5,
     flexDirection: 'row',
-    ...shadows,
+    // ...shadows,
   },
   inputs: {
     flex: 1,
