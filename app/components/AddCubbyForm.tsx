@@ -11,7 +11,6 @@ import {
 
 import {buttonStyles} from '../styles/button';
 import {lightStyles, darkStyles} from '../styles/theme';
-import colors from '../styles/colors';
 // import {shadows} from '../styles/shadows';
 
 type AddCubbyFormProps = {
@@ -81,8 +80,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     paddingVertical: Platform.OS === 'ios' ? 15 : 0,
     borderRadius: 5,
-    backgroundColor: colors.white,
-    color: colors.darkBlue,
     fontSize: 17,
   },
   textInputName: {

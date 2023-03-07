@@ -14,12 +14,14 @@ const HomeStackNavigator = () => {
       <HomeStack.Screen
         name="CubbyManager"
         component={CubbyManager} // TODO: Figure out why TS is mad here
-        options={{title: 'Welcome'}}
+        options={{headerShown: false}}
       />
       <HomeStack.Screen
         name="CubbyScreen"
         component={CubbyScreen} // TODO: Figure out why TS is mad
-        options={{title: 'Cubby'}} // TODO: Need global state for active cubby. Use its title here.
+        options={({route}) => ({
+          title: route.params.name,
+        })}
       />
     </HomeStack.Navigator>
   );

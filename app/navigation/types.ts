@@ -12,6 +12,11 @@ export type HomeStackNavigatorParamList = {
   };
 };
 
+export type BottomTabNavigatorParamList = {
+  Home: HomeStackNavigatorParamList;
+  FindBook: undefined;
+};
+
 export type HomeScreenNavigationProp = NativeStackNavigationProp<
   HomeStackNavigatorParamList,
   'CubbyScreen' // All route possibilities for CubbyManager. Undefined means access to all routes.
@@ -31,9 +36,3 @@ export type CubbyScreenRouteProp = RouteProp<
   HomeStackNavigatorParamList,
   'CubbyScreen'
 >;
-
-export type BottomTabNavigatorParamList = {
-  Home: HomeStackNavigatorParamList;
-  Cubby: CubbyScreenRouteProp;
-  FindBook: undefined;
-};

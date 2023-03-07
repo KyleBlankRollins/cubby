@@ -1,10 +1,9 @@
 import * as React from 'react';
 import {useColorScheme} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
+import BottomTabs from './Tabs';
 
 import {light, dark} from '../styles/theme';
-
-import HomeStackNavigator from './HomeStack';
 
 const RootNavigator = () => {
   const isDarkMode = useColorScheme() === 'dark';
@@ -24,7 +23,7 @@ const RootNavigator = () => {
 
   return (
     <NavigationContainer theme={NavigatorTheme}>
-      <HomeStackNavigator />
+      <BottomTabs />
     </NavigationContainer>
   );
 };
