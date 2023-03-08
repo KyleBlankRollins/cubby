@@ -79,6 +79,7 @@ const lightStyles = StyleSheet.create({
     backgroundColor: light.surface4,
     color: light.text1,
   },
+  // TODO: Create a warning surface.
 });
 
 const darkStyles = StyleSheet.create({
@@ -98,6 +99,7 @@ const darkStyles = StyleSheet.create({
     backgroundColor: dark.surface4,
     color: dark.text1,
   },
+  // TODO: Create a warning surface.
 });
 
 export {light, lightStyles, dark, darkStyles};

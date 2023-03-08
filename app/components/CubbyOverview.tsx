@@ -1,24 +1,45 @@
 import React from 'react';
 import Realm from 'realm';
-import {View, Text, Pressable, StyleSheet} from 'react-native';
+import {View, Text, Pressable, Alert, StyleSheet} from 'react-native';
+
 import {useNavigation} from '@react-navigation/native';
 import {HomeScreenNavigationProp} from '../navigation/types';
 
-// import {shadows} from '../styles/shadows';
-import colors from '../styles/colors';
 import {Cubby} from '../models/Cubby';
+import {AppButton} from './AppButton';
 
 type CubbyOverviewProps = {
   cubby: Cubby & Realm.Object;
   onDelete: () => void;
 };
-
+// Pick up here. Need to add delete and maybe edit buttons.
 export const CubbyOverview = React.memo<CubbyOverviewProps>(
   ({cubby, onDelete}) => {
     const navigation = useNavigation<HomeScreenNavigationProp>();
 
+    let numberOfBooks: number = 0;
+
+    for (let index = 0; index < cubby.sections.length; index++) {
+      const section = cubby.sections[index];
+
+      numberOfBooks = numberOfBooks + section.books.length;
+    }
+
+    const createAlert = () =>
+      Alert.alert(
+        `${cubby.name}?`,
+        'Are you sure you want to delete this Cubby?',
+        [
+          {
+            text: 'Cancel',
+            onPress: () => console.log('Cancel Pressed'),
+            style: 'cancel',
+          },
+          {text: 'Yes', onPress: () => onDelete()},
+        ],
+      );
+
     return (
-      // TODO: Change this to <Pressable> and navigate to cubby view on press.
       <Pressable
         style={styles.cubby}
         onPress={() =>
@@ -40,13 +61,11 @@ export const CubbyOverview = React.memo<CubbyOverviewProps>(
           </View>
         </View>
         <View style={styles.infoContainer}>
-          {/* <View style={styles.books}>
-            <Text style={styles.bookText}> {cubby.books.length} books </Text>
-          </View> */}
-          {/* TODO: Move delete functionality to Cubby view */}
-          {/* <Pressable onPress={onDelete} style={styles.deleteButton}>
-            <Text style={styles.deleteText}>Delete</Text>
-          </Pressable> */}
+          <View style={styles.books}>
+            <Text> {numberOfBooks} books </Text>
+          </View>
+          {/* TODO: Add warning color. */}
+          <AppButton title={'Delete'} onPress={createAlert} />
         </View>
       </Pressable>
     );
@@ -87,28 +106,6 @@ const styles = StyleSheet.create({
     fontSize: 25,
   },
   books: {
-    flex: 0.25,
     justifyContent: 'center',
-  },
-  status: {
-    width: 50,
-    height: '100%',
-    justifyContent: 'center',
-    borderTopLeftRadius: 5,
-    borderBottomLeftRadius: 5,
-  },
-  deleteButton: {
-    flex: 0.75,
-    justifyContent: 'center',
-    // TODO: give a warning color
-  },
-  deleteText: {
-    marginHorizontal: 10,
-    fontSize: 17,
-  },
-  icon: {
-    textAlign: 'center',
-    fontSize: 17,
-    fontWeight: 'bold',
   },
 });
