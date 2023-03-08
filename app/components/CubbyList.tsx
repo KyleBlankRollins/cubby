@@ -30,8 +30,11 @@ const CubbyList: React.FC<CubbyListProps> = ({cubbies, onDeleteCubby}) => {
 
 const styles = StyleSheet.create({
   listContainer: {
-    flex: 1,
-    justifyContent: 'center',
+    // flex: 1,
+    // height: 300,
+    // backgroundColor: '#fff',
+    // marginHorizontal: 20,
+    // justifyContent: 'center',
   },
 });
 

@@ -1,12 +1,13 @@
 import React from 'react';
 import Realm from 'realm';
-import {View, Text, Pressable, Alert, StyleSheet} from 'react-native';
+import {View, Pressable, Alert, StyleSheet} from 'react-native';
 
 import {useNavigation} from '@react-navigation/native';
 import {HomeScreenNavigationProp} from '../navigation/types';
 
 import {Cubby} from '../models/Cubby';
-import {AppButton} from './AppButton';
+import {AppButton} from '../baseComponents/AppButton';
+import {AppText} from '../baseComponents/AppText';
 
 type CubbyOverviewProps = {
   cubby: Cubby & Realm.Object;
@@ -50,19 +51,15 @@ export const CubbyOverview = React.memo<CubbyOverviewProps>(
         }>
         <View style={styles.overviewContainer}>
           <View style={styles.nameContainer}>
-            <Text numberOfLines={1} style={styles.name}>
-              {cubby.name}
-            </Text>
+            <AppText numberOfLines={1}>{cubby.name}</AppText>
           </View>
           <View style={styles.descriptionContainer}>
-            <Text numberOfLines={1} style={styles.description}>
-              {cubby.description}
-            </Text>
+            <AppText numberOfLines={1}>{cubby.description}</AppText>
           </View>
         </View>
         <View style={styles.infoContainer}>
           <View style={styles.books}>
-            <Text> {numberOfBooks} books </Text>
+            <AppText> {numberOfBooks} books </AppText>
           </View>
           {/* TODO: Add warning color. */}
           <AppButton title={'Delete'} onPress={createAlert} />

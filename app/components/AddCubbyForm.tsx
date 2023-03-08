@@ -2,7 +2,6 @@ import React, {useState} from 'react';
 import {
   Modal,
   View,
-  Text,
   TextInput,
   Pressable,
   Platform,
@@ -12,7 +11,7 @@ import {
 
 import {buttonStyles} from '../styles/button';
 import {lightStyles, darkStyles} from '../styles/theme';
-// import {shadows} from '../styles/shadows';
+import {AppText} from '../baseComponents/AppText';
 
 type AddCubbyFormProps = {
   onSubmit: (description: string, name: string) => void;
@@ -82,10 +81,10 @@ export const AddCubbyForm: React.FC<AddCubbyFormProps> = ({
         </View>
         <View style={styles.verticalButtonGroup}>
           <Pressable onPress={handleSubmit} style={styles.submit}>
-            <Text style={styles.icon}>＋</Text>
+            <AppText>＋</AppText>
           </Pressable>
           <Pressable onPress={handleClose} style={styles.submit}>
-            <Text style={styles.icon}>X</Text>
+            <AppText>X</AppText>
           </Pressable>
         </View>
       </View>
@@ -130,9 +129,6 @@ const styles = StyleSheet.create({
     marginVertical: 2,
     marginLeft: 10,
     marginRight: 0,
-  },
-  icon: {
-    ...buttonStyles.text,
   },
   verticalButtonGroup: {
     justifyContent: 'center',

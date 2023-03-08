@@ -1,30 +1,21 @@
 import React from 'react';
-import {View, Text, StyleSheet} from 'react-native';
-// @ts-ignore openURLInBrowser will open the url in your machine browser. (This isn't currently typed in React Native)
+import {View, StyleSheet} from 'react-native';
+
+import {AppText} from '../baseComponents/AppText';
+import {AppHeaderText} from '../baseComponents/AppHeaderText';
 
 export const IntroText = () => {
   return (
     <View style={styles.content}>
-      <Text style={styles.paragraph}>Welcome to Cubby!</Text>
-      <Text style={styles.paragraph}>
-        Get started by adding your first Cubby of books.
-      </Text>
+      <AppHeaderText level={2}>Welcome to Cubby!</AppHeaderText>
+      <AppText>Get started by adding your first Cubby of books.</AppText>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   content: {
-    marginHorizontal: 20,
-    justifyContent: 'center',
-  },
-  paragraph: {
-    marginVertical: 10,
-    textAlign: 'center',
-    fontSize: 17,
-    fontWeight: '500',
-  },
-  link: {
-    fontWeight: 'bold',
+    // marginHorizontal: 20,
+    // justifyContent: 'center',
   },
 });

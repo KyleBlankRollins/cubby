@@ -1,9 +1,11 @@
-import {StyleSheet, View, Text, ScrollView} from 'react-native';
+import React from 'react';
+import {StyleSheet, View, ScrollView} from 'react-native';
 
 import {useNavigation} from '@react-navigation/native';
 
 import {BookOverview} from '../components/BookOverview';
-import {AppButton} from '../components/AppButton';
+import {AppButton} from '../baseComponents/AppButton';
+import {AppText} from '../baseComponents/AppText';
 
 import {RealmContext} from '../models';
 const {useQuery} = RealmContext;
@@ -23,7 +25,7 @@ export function CubbySection({sectionId}) {
 
   return (
     <View style={sectionStyles}>
-      <Text>{section.name}</Text>
+      <AppText>{section.name}</AppText>
 
       <AppButton
         title="Add book"

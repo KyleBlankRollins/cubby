@@ -9,7 +9,8 @@ import {
   View,
 } from 'react-native';
 
-import {AppButton} from '../components/AppButton';
+import {AppButton} from '../baseComponents/AppButton';
+import {AppText} from '../baseComponents/AppText';
 import {BookScreenNavigationProp} from '../navigation/types';
 // import {BookView} from './BookView';
 // TODO: TypeScriptify this component
@@ -45,12 +46,12 @@ export const FindBookScreen: React.FC<BookScreenNavigationProp> = () => {
   return (
     <SafeAreaView style={styles.container}>
       <View>
-        <Text>Enter a book's ISBN and get information about it!</Text>
-        <Text selectable={true}>
+        <AppText>Enter a book's ISBN and get information about it!</AppText>
+        <AppText selectable={true}>
           {' '}
           For example:
-          <Text>9781250214713</Text>
-        </Text>
+          <AppText>9781250214713</AppText>
+        </AppText>
         <TextInput
           style={styles.input}
           onChangeText={setIsbn}

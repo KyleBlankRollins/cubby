@@ -5,7 +5,7 @@ import {StyleSheet, View} from 'react-native';
 import {AddCubbyForm} from '../components/AddCubbyForm';
 import {IntroText} from '../components/IntroText';
 import CubbyList from '../components/CubbyList';
-import {AppButton} from '../components/AppButton';
+import {AppButton} from '../baseComponents/AppButton';
 
 import {Cubby} from '../models/Cubby';
 import {Section} from '../models/Section';
@@ -78,33 +78,24 @@ export const CubbyManager: React.FC<HomeScreenNavigationProp> = () => {
   return (
     <View style={[styles.container, handleModalOpacity()]}>
       {!cubbies || !cubbies.length ? (
-        <>
-          <IntroText />
-          <AppButton
-            onPress={() => {
-              setCubbyFormVisible(true);
-              setOpacityLevel(0.25);
-            }}
-            title="Add Cubby"
-            options={{
-              customStyle: styles.customButtonStyle,
-              fullWidth: false,
-              largeText: true,
-            }}
-          />
-        </>
+        <IntroText />
       ) : (
-        <>
-          <CubbyList cubbies={cubbies} onDeleteCubby={handleDeleteCubby} />
-          <AppButton
-            onPress={() => {
-              setCubbyFormVisible(true);
-              setOpacityLevel(0.25);
-            }}
-            title="Add Cubby"
-          />
-        </>
+        <CubbyList cubbies={cubbies} onDeleteCubby={handleDeleteCubby} />
       )}
+
+      <AppButton
+        onPress={() => {
+          setCubbyFormVisible(true);
+          setOpacityLevel(0.25);
+        }}
+        title="Add Cubby"
+        options={{
+          customStyle: styles.customButtonStyle,
+          fullWidth: false,
+          largeText: true,
+        }}
+      />
+
       <AddCubbyForm
         onSubmit={handleAddCubby}
         onClose={handleModalClose}
@@ -113,12 +104,12 @@ export const CubbyManager: React.FC<HomeScreenNavigationProp> = () => {
     </View>
   );
 };
-
+// TODO: Figure out why IntroText and CubbyList can't both be aligned the same way.
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
+    // alignItems: 'center',
   },
   customButtonStyle: {
     marginVertical: 30,

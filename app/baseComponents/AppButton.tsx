@@ -1,5 +1,7 @@
 import React from 'react';
-import {StyleSheet, TouchableOpacity, Text, ViewStyle} from 'react-native';
+import {StyleSheet, TouchableOpacity, ViewStyle} from 'react-native';
+
+import {AppButtonText} from './AppButtonText';
 
 type AppButtonProps = {
   onPress: () => void;
@@ -32,7 +34,7 @@ export const AppButton = React.memo<AppButtonProps>(
           buttonWidth,
           options?.customStyle,
         ]}>
-        <Text style={[styles.appButtonText, textSize]}> {title} </Text>
+        <AppButtonText customStyle={textSize}> {title} </AppButtonText>
       </TouchableOpacity>
     );
   },

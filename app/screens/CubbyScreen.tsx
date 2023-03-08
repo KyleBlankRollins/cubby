@@ -6,7 +6,8 @@ import {CubbyScreenNavigationProp} from '../navigation/types';
 import {CubbyScreenRouteProp} from '../navigation/types';
 import {Cubby} from '../models/Cubby';
 import {CubbySection} from '../components/CubbySection';
-import {AppButton} from '../components/AppButton';
+import {AppButton} from '../baseComponents/AppButton';
+import {AppText} from '../baseComponents/AppText';
 
 import {RealmContext} from '../models';
 
@@ -24,10 +25,10 @@ export const CubbyScreen: React.FC<CubbyScreenNavigationProp> = () => {
   return (
     <View style={{flex: 1}}>
       {/* TODO: handle null cubby case */}
-      <Text>{cubby.description}</Text>
+      <AppText>{cubby!.description}</AppText>
 
       <ScrollView contentContainerStyle={styles.containerFlex}>
-        {cubby.sections.map((section, index) => {
+        {cubby!.sections.map((section, index) => {
           return (
             <CubbySection key={index} sectionId={JSON.stringify(section._id)} />
           );

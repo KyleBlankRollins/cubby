@@ -1,15 +1,17 @@
+import React from 'react';
 import {FlatList, Image, StyleSheet, Text, View} from 'react-native';
 
 import {useNavigation} from '@react-navigation/native';
 
-import {AppButton} from '../components/AppButton';
+import {AppButton} from '../baseComponents/AppButton';
+import {AppText} from '../baseComponents/AppText';
 
 export function BookView({bookInfo, sectionInfo}) {
   const navigation = useNavigation();
 
   const Item = ({title}) => (
     <View>
-      <Text>{title}</Text>
+      <AppText>{title}</AppText>
     </View>
   );
 
@@ -42,16 +44,16 @@ export function BookView({bookInfo, sectionInfo}) {
         />
       </View>
       <View>
-        <Text>{bookInfo.title}</Text>
+        <AppText>{bookInfo.title}</AppText>
 
-        <Text>Author(s)</Text>
+        <AppText>Author(s)</AppText>
         <FlatList
           data={bookInfo.authors}
           renderItem={renderItem}
           keyExtractor={author => author.name}
         />
 
-        <Text>Subjects</Text>
+        <AppText>Subjects</AppText>
         <FlatList
           data={bookInfo.subjects}
           renderItem={renderItem}

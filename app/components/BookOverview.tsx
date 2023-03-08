@@ -1,6 +1,8 @@
-import {StyleSheet, View, Text, Image, ScrollView} from 'react-native';
+import {StyleSheet, View, Image, ScrollView} from 'react-native';
 
-import {AppButton} from '../components/AppButton';
+import {AppButton} from '../baseComponents/AppButton';
+import {AppText} from '../baseComponents/AppText';
+import {AppHeaderText} from '../baseComponents/AppHeaderText';
 
 import {RealmContext} from '../models';
 const {useRealm, useQuery} = RealmContext;
@@ -12,8 +14,8 @@ export function BookOverview({bookId}) {
 
   return (
     <View>
-      <Text>{book.title}</Text>
-      <Text>{book.description}</Text>
+      <AppHeaderText level={3}>{book.title}</AppHeaderText>
+      <AppText>{book.description}</AppText>
 
       {/* TODO: Add placeholder for books with no cover */}
       {book.cover && book.cover.medium && (
