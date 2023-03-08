@@ -1,24 +1,38 @@
 import React from 'react';
-import {StyleSheet, TouchableOpacity, Text} from 'react-native';
+import {StyleSheet, TouchableOpacity, Text, ViewStyle} from 'react-native';
 
 type AppButtonProps = {
   onPress: () => void;
   title: string;
-  bgColor?: string;
-  fullWidth?: boolean;
+  options?: {
+    bgColor?: string;
+    fullWidth?: boolean;
+    customStyle?: ViewStyle;
+    largeText?: boolean;
+  };
 };
 
 export const AppButton = React.memo<AppButtonProps>(
-  ({onPress, title, bgColor, fullWidth}) => {
+  ({onPress, title, options}) => {
+    // TODO: find a way to not hard code the default color.
+    const background = {
+      backgroundColor: options?.bgColor ? options.bgColor : '#5A527D',
+    };
+    const textSize = {
+      fontSize: options?.largeText ? 24 : 12,
+    };
+    const buttonWidth = options?.fullWidth ? styles.fullWidth : styles.fitWidth;
+
     return (
       <TouchableOpacity
         onPress={onPress}
         style={[
           styles.appButtonContainer,
-          bgColor ? {backgroundColor: bgColor} : {backgroundColor: '#5A527D'},
-          fullWidth ? styles.fullWidth : styles.fitWidth,
+          background,
+          buttonWidth,
+          options?.customStyle,
         ]}>
-        <Text style={styles.appButtonText}> {title} </Text>
+        <Text style={[styles.appButtonText, textSize]}> {title} </Text>
       </TouchableOpacity>
     );
   },
@@ -31,7 +45,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
   },
   appButtonText: {
-    fontSize: 12,
     color: '#fff',
     fontWeight: 'bold',
     alignSelf: 'center',

@@ -3,7 +3,7 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 
 import {BottomTabNavigatorParamList} from './types';
 import HomeStackNavigator from './HomeStack';
-import FindBookScreen from '../screens/FindBookScreen';
+import {FindBookScreen} from '../screens/FindBookScreen';
 
 const Tab = createBottomTabNavigator<BottomTabNavigatorParamList>();
 

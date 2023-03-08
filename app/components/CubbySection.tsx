@@ -26,8 +26,8 @@ export function CubbySection({sectionId}) {
       <Text>{section.name}</Text>
 
       <AppButton
-        fullWidth={true}
         title="Add book"
+        options={{fullWidth: true}}
         onPress={() => {
           navigation.navigate('Find a book', {
             section: JSON.stringify({

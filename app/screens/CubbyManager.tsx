@@ -78,18 +78,33 @@ export const CubbyManager: React.FC<HomeScreenNavigationProp> = () => {
   return (
     <View style={[styles.container, handleModalOpacity()]}>
       {!cubbies || !cubbies.length ? (
-        <IntroText />
+        <>
+          <IntroText />
+          <AppButton
+            onPress={() => {
+              setCubbyFormVisible(true);
+              setOpacityLevel(0.25);
+            }}
+            title="Add Cubby"
+            options={{
+              customStyle: styles.customButtonStyle,
+              fullWidth: false,
+              largeText: true,
+            }}
+          />
+        </>
       ) : (
-        <CubbyList cubbies={cubbies} onDeleteCubby={handleDeleteCubby} />
+        <>
+          <CubbyList cubbies={cubbies} onDeleteCubby={handleDeleteCubby} />
+          <AppButton
+            onPress={() => {
+              setCubbyFormVisible(true);
+              setOpacityLevel(0.25);
+            }}
+            title="Add Cubby"
+          />
+        </>
       )}
-      {/* TODO: Don't show this all the time */}
-      <AppButton
-        onPress={() => {
-          setCubbyFormVisible(true);
-          setOpacityLevel(0.25);
-        }}
-        title="Add Cubby"
-      />
       <AddCubbyForm
         onSubmit={handleAddCubby}
         onClose={handleModalClose}
@@ -100,19 +115,13 @@ export const CubbyManager: React.FC<HomeScreenNavigationProp> = () => {
 };
 
 const styles = StyleSheet.create({
-  input: {
-    margin: 12,
-    borderWidth: 1,
-    padding: 10,
-  },
   container: {
     flex: 1,
-  },
-  buttonGroup: {
-    flex: 1,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
     justifyContent: 'center',
-    marginVertical: 8,
+    alignItems: 'center',
+  },
+  customButtonStyle: {
+    marginVertical: 30,
+    width: 300,
   },
 });

@@ -45,9 +45,8 @@ export const CubbyScreen: React.FC<CubbyScreenNavigationProp> = () => {
         }}
       /> */}
         <AppButton
-          bgColor={'#5F2234'}
           title="Delete Cubby"
-          fullWidth={true}
+          options={{bgColor: '#5F2234', fullWidth: true}}
           onPress={() => {
             realm.write(() => {
               realm.delete(cubby);

@@ -28,6 +28,11 @@ export type CubbyScreenNavigationProp = NativeStackNavigationProp<
   'CubbyManager' // All route possibilities for CubbyManager. Undefined means access to all routes.
 >;
 
+export type BookScreenNavigationProp = NativeStackNavigationProp<
+  HomeStackNavigatorParamList,
+  'CubbyManager' // All route possibilities for CubbyManager. Undefined means access to all routes.
+>;
+
 // export type HomeScreenRouteProp = RouteProp<
 //   HomeStackNavigatorParamList,
 //   'CubbyManager'
