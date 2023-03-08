@@ -69,7 +69,9 @@ export const FindBookScreen: React.FC<BookScreenNavigationProp> = () => {
         />
       </View>
 
-      <ScrollView>{JSON.stringify(bookInfo, null, 2)}</ScrollView>
+      <ScrollView>
+        <AppText>{JSON.stringify(bookInfo, null, 2)}</AppText>
+      </ScrollView>
 
       {/* {bookInfo && <BookView bookInfo={bookInfo} sectionInfo={sectionInfo} />} */}
     </SafeAreaView>

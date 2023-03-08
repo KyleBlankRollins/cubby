@@ -15,7 +15,7 @@ const BottomTabs = () => {
         component={HomeStackNavigator}
         options={{headerShown: false}}
       />
-      <Tab.Screen name="FindBook" component={FindBookScreen} />
+      <Tab.Screen name="Find a book" component={FindBookScreen} />
       {/* <Tab.Screen name="All books" component={} /> */}
     </Tab.Navigator>
   );

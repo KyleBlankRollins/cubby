@@ -15,7 +15,7 @@ export type HomeStackNavigatorParamList = {
 
 export type BottomTabNavigatorParamList = {
   Home: HomeStackNavigatorParamList;
-  FindBook: undefined;
+  'Find a book': undefined;
 };
 
 export type HomeScreenNavigationProp = NativeStackNavigationProp<
