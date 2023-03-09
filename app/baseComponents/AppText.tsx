@@ -8,15 +8,12 @@ type AppTextProps = {
   selectable?: boolean;
 };
 
-export const AppText: React.FC<AppTextProps> = (
-  props,
-  {customStyle, numberOfLines, selectable},
-) => {
+export const AppText: React.FC<AppTextProps> = props => {
   return (
     <Text
-      style={[styles.defaultStyle, customStyle]}
-      numberOfLines={numberOfLines}
-      selectable={selectable}>
+      style={[styles.defaultStyle, props.customStyle]}
+      numberOfLines={props.numberOfLines}
+      selectable={props.selectable}>
       {props.children}
     </Text>
   );

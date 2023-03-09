@@ -1,6 +1,10 @@
 import {Realm} from '@realm/react';
 import {
   Author,
+  Cover,
+  Ebook,
+  Excerpt,
+  Identifier,
   Link,
   Publisher,
   Subject,
@@ -9,39 +13,45 @@ import {
 
 export class Book extends Realm.Object<Book> {
   _id: Realm.BSON.ObjectId = new Realm.BSON.ObjectId();
-  url!: string;
-  key!: string;
-  title!: string;
-  subtitle!: string;
-  numberOfPages!: number;
-  notes!: string;
-  cover!: object;
-  subjects!: Realm.List<Subject>;
-  tableOfContents!: Realm.List<TableOfContents>;
-  links!: Realm.List<Link>;
-  publishers!: Realm.List<Publisher>;
   authors!: Realm.List<Author>;
+  cover?: Cover;
+  ebooks?: Realm.List<Ebook>;
+  excerpts?: Realm.List<Excerpt>;
+  identifiers!: Realm.List<Identifier>;
+  key!: string;
+  links?: Realm.List<Link>;
+  numberOfPages!: number;
+  notes?: string;
+  publishDate?: string;
+  publishers!: Realm.List<Publisher>;
+  subjects?: Realm.List<Subject>;
+  subtitle?: string;
+  tableOfContents?: Realm.List<TableOfContents>;
+  title!: string;
+  url!: string;
   userId?: Realm.BSON.ObjectId;
 
   static schema = {
     name: 'Book',
     properties: {
       _id: 'objectId',
-      userId: 'string?',
-      url: 'string',
-      key: 'string',
-      title: 'string',
-      subtitle: 'string?',
-      numberOfPages: 'int',
-      cover: '{}',
-      subjects: {type: 'list', objectType: 'Subject'},
-      notes: 'string?',
-      tableOfContents: {type: 'list', objectType: 'Table_of_contents'},
-      links: {type: 'list', objectType: 'Link'},
-      publishers: {type: 'list', objectType: 'Publisher'},
-      // publishDate: "date",
-      // identifiers: "{}",
       authors: {type: 'list', objectType: 'Author'},
+      cover: 'Cover?',
+      ebooks: {type: 'list', objectType: 'Ebook'},
+      excerpts: {type: 'list', objectType: 'Excerpt'},
+      identifiers: {type: 'list', objectType: 'Identifier'},
+      key: 'string',
+      links: {type: 'list', objectType: 'Link'},
+      numberOfPages: 'int',
+      notes: 'string?',
+      publishDate: 'string',
+      publishers: {type: 'list', objectType: 'Publisher'},
+      subjects: {type: 'list', objectType: 'Subject'},
+      subtitle: 'string?',
+      tableOfContents: {type: 'list', objectType: 'Table_of_contents'},
+      title: 'string',
+      url: 'string',
+      userId: 'string?',
       assignee: {
         type: 'linkingObjects',
         objectType: 'Section',
@@ -53,36 +63,44 @@ export class Book extends Realm.Object<Book> {
 
   static generate(
     bookInfo: {
-      url: string;
-      key: string;
-      title: string;
-      subtitle: string;
-      number_of_pages: number;
-      notes: string;
-      cover: object;
-      subjects: Realm.List<Subject>;
-      table_of_contents: Realm.List<TableOfContents>;
-      links: Realm.List<Link>;
-      publishers: Realm.List<Publisher>;
       authors: Realm.List<Author>;
+      cover?: Cover;
+      ebooks?: Realm.List<Ebook>;
+      excerpts?: Realm.List<Excerpt>;
+      identifiers: Realm.List<Identifier>;
+      key: string;
+      links?: Realm.List<Link>;
+      number_of_pages: number;
+      notes?: string;
+      publishDate: string;
+      publishers: Realm.List<Publisher>;
+      subjects?: Realm.List<Subject>;
+      subtitle?: string;
+      table_of_contents?: Realm.List<TableOfContents>;
+      title: string;
+      url: string;
     },
     userId?: Realm.BSON.ObjectId | undefined,
   ) {
     return {
       _id: new Realm.BSON.ObjectId(),
-      userId: userId,
-      url: bookInfo.url,
-      key: bookInfo.key,
-      title: bookInfo.title,
-      subtitle: bookInfo.subtitle ? bookInfo.subtitle : '',
-      numberOfPages: bookInfo.number_of_pages,
-      cover: bookInfo.cover,
-      subjects: bookInfo.subjects,
-      notes: bookInfo.notes ? bookInfo.notes : '',
-      tableOfContents: bookInfo.table_of_contents,
-      links: bookInfo.links,
-      publishers: bookInfo.publishers,
       authors: bookInfo.authors,
+      cover: bookInfo.cover,
+      ebooks: bookInfo.ebooks,
+      excerpts: bookInfo.excerpts,
+      identifiers: bookInfo.identifiers,
+      key: bookInfo.key,
+      links: bookInfo.links,
+      numberOfPages: bookInfo.number_of_pages,
+      notes: bookInfo.notes,
+      publishDate: bookInfo.publishDate,
+      publishers: bookInfo.publishers,
+      subjects: bookInfo.subjects,
+      subtitle: bookInfo.subtitle,
+      tableOfContents: bookInfo.table_of_contents,
+      title: bookInfo.title,
+      url: bookInfo.url,
+      userId: userId,
     };
   }
 }

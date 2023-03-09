@@ -4,6 +4,10 @@ import {Cubby} from './Cubby';
 import {Section} from './Section';
 import {
   Author,
+  Cover,
+  Ebook,
+  Excerpt,
+  Identifier,
   Link,
   Publisher,
   Subject,
@@ -16,6 +20,10 @@ export const RealmContext = createRealmContext({
     Cubby,
     Section,
     Author,
+    Cover,
+    Ebook,
+    Excerpt,
+    Identifier,
     Link,
     Publisher,
     Subject,

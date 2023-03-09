@@ -26,6 +26,7 @@ export const CubbyManager: React.FC<HomeScreenNavigationProp> = () => {
 
   const handleAddCubby = useCallback(
     (description: string, name: string): void => {
+      // TODO: Add alert about needing these.
       if (!description || !name) {
         return;
       }

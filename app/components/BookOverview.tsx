@@ -1,3 +1,4 @@
+import React from 'react';
 import {StyleSheet, View, Image, ScrollView} from 'react-native';
 
 import {AppButton} from '../baseComponents/AppButton';
@@ -5,17 +6,23 @@ import {AppText} from '../baseComponents/AppText';
 import {AppHeaderText} from '../baseComponents/AppHeaderText';
 
 import {RealmContext} from '../models';
+import {Book} from '../models/Book';
 const {useRealm, useQuery} = RealmContext;
-// TODO: TypeScriptify this component
-export function BookOverview({bookId}) {
-  const id = JSON.parse(bookId);
+
+type BookOverviewProps = {
+  bookId: string;
+};
+
+export const BookOverview: React.FC<BookOverviewProps> = props => {
+  const id = JSON.parse(props.bookId);
   const realm = useRealm();
-  const book = useQuery('Book').filtered(`_id == oid(${id})`)[0];
+  const result = useQuery(Book);
+  const book = result.filtered(`_id == oid(${id})`)[0];
 
   return (
     <View>
       <AppHeaderText level={3}>{book.title}</AppHeaderText>
-      <AppText>{book.description}</AppText>
+      <AppText>{book}</AppText>
 
       {/* TODO: Add placeholder for books with no cover */}
       {book.cover && book.cover.medium && (
@@ -43,4 +50,4 @@ export function BookOverview({bookId}) {
       />
     </View>
   );
-}
+};

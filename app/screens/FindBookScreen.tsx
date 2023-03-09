@@ -1,21 +1,13 @@
 import React, {useState} from 'react';
-import {
-  Alert,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
+import {Alert, SafeAreaView, StyleSheet, TextInput, View} from 'react-native';
 
 import {AppButton} from '../baseComponents/AppButton';
 import {AppText} from '../baseComponents/AppText';
 import {BookScreenNavigationProp} from '../navigation/types';
-// import {BookView} from './BookView';
+import {BookScreen} from './BookScreen';
+
 // TODO: TypeScriptify this component
 export const FindBookScreen: React.FC<BookScreenNavigationProp> = () => {
-  // const sectionInfo = JSON.parse(route.params.section);
   const [isbn, setIsbn] = useState('');
   const [bookInfo, setBookInfo] = useState('');
   const [findBookButtonText, setFindBookButtonText] = useState('Find book');
@@ -63,17 +55,12 @@ export const FindBookScreen: React.FC<BookScreenNavigationProp> = () => {
         <AppButton
           title={findBookButtonText}
           onPress={() => {
-            console.log('find book selected');
             requestBook();
           }}
         />
       </View>
 
-      <ScrollView>
-        <AppText>{JSON.stringify(bookInfo, null, 2)}</AppText>
-      </ScrollView>
-
-      {/* {bookInfo && <BookView bookInfo={bookInfo} sectionInfo={sectionInfo} />} */}
+      {bookInfo && <BookScreen bookInfo={bookInfo} />}
     </SafeAreaView>
   );
 };
@@ -84,19 +71,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: 10,
   },
-  logo: {
-    width: 300,
-    height: 200,
-  },
   container: {
     flex: 1,
-  },
-  text: {
-    color: 'white',
-    fontSize: 42,
-    lineHeight: 84,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    backgroundColor: '#000000c0',
   },
 });

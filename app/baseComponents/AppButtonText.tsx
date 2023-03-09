@@ -6,9 +6,11 @@ type AppTextProps = {
   children: React.ReactNode;
 };
 // TODO: Figure out why customStyle isn't coming from the button.
-export const AppButtonText: React.FC<AppTextProps> = (props, customStyle) => {
+export const AppButtonText: React.FC<AppTextProps> = props => {
   return (
-    <Text style={[styles.defaultStyle, customStyle]}>{props.children}</Text>
+    <Text style={[styles.defaultStyle, props.customStyle]}>
+      {props.children}
+    </Text>
   );
 };
 

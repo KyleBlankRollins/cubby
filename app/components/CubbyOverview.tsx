@@ -8,6 +8,7 @@ import {HomeScreenNavigationProp} from '../navigation/types';
 import {Cubby} from '../models/Cubby';
 import {AppButton} from '../baseComponents/AppButton';
 import {AppText} from '../baseComponents/AppText';
+import {AppHeaderText} from '../baseComponents/AppHeaderText';
 
 type CubbyOverviewProps = {
   cubby: Cubby & Realm.Object;
@@ -51,7 +52,9 @@ export const CubbyOverview = React.memo<CubbyOverviewProps>(
         }>
         <View style={styles.overviewContainer}>
           <View style={styles.nameContainer}>
-            <AppText numberOfLines={1}>{cubby.name}</AppText>
+            <AppHeaderText numberOfLines={1} level={2}>
+              {cubby.name}
+            </AppHeaderText>
           </View>
           <View style={styles.descriptionContainer}>
             <AppText numberOfLines={1}>{cubby.description}</AppText>
@@ -71,7 +74,7 @@ export const CubbyOverview = React.memo<CubbyOverviewProps>(
 
 const styles = StyleSheet.create({
   cubby: {
-    height: 100,
+    height: 150,
     alignSelf: 'stretch',
     flexDirection: 'row',
     marginVertical: 8,

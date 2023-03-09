@@ -1,6 +1,6 @@
 import {Realm} from '@realm/react';
 
-class Author extends Realm.Object<Author> {
+export class Author extends Realm.Object<Author> {
   _id: Realm.BSON.ObjectId = new Realm.BSON.ObjectId();
   name!: string;
   url!: string;
@@ -15,7 +15,67 @@ class Author extends Realm.Object<Author> {
   };
 }
 
-class Link extends Realm.Object<Link> {
+export class Cover extends Realm.Object<Cover> {
+  _id: Realm.BSON.ObjectId = new Realm.BSON.ObjectId();
+  large?: string;
+  medium?: string;
+  small?: string;
+
+  static schema = {
+    name: 'Cover',
+    embedded: true,
+    properties: {
+      large: 'string',
+      medium: 'string',
+      small: 'string',
+    },
+  };
+}
+
+export class Ebook extends Realm.Object<Ebook> {
+  _id: Realm.BSON.ObjectId = new Realm.BSON.ObjectId();
+  previewUrl!: string;
+
+  static schema = {
+    name: 'Ebook',
+    embedded: true,
+    properties: {
+      previewUrl: 'string',
+    },
+  };
+}
+
+export class Excerpt extends Realm.Object<Excerpt> {
+  _id: Realm.BSON.ObjectId = new Realm.BSON.ObjectId();
+  comment!: string;
+  text!: string;
+
+  static schema = {
+    name: 'Excerpt',
+    embedded: true,
+    properties: {
+      comment: 'string',
+      text: 'string',
+    },
+  };
+}
+
+export class Identifier extends Realm.Object<Identifier> {
+  _id: Realm.BSON.ObjectId = new Realm.BSON.ObjectId();
+  identifierType!: string;
+  identifierValue!: string;
+
+  static schema = {
+    name: 'Identifier',
+    embedded: true,
+    properties: {
+      identifierType: 'string',
+      identifierValue: 'string',
+    },
+  };
+}
+
+export class Link extends Realm.Object<Link> {
   _id: Realm.BSON.ObjectId = new Realm.BSON.ObjectId();
   title!: string;
   url!: string;
@@ -30,7 +90,7 @@ class Link extends Realm.Object<Link> {
   };
 }
 
-class Publisher extends Realm.Object<Publisher> {
+export class Publisher extends Realm.Object<Publisher> {
   _id: Realm.BSON.ObjectId = new Realm.BSON.ObjectId();
   name!: string;
 
@@ -43,7 +103,7 @@ class Publisher extends Realm.Object<Publisher> {
   };
 }
 
-class Subject extends Realm.Object<Subject> {
+export class Subject extends Realm.Object<Subject> {
   _id: Realm.BSON.ObjectId = new Realm.BSON.ObjectId();
   name!: string;
   url!: string;
@@ -58,7 +118,7 @@ class Subject extends Realm.Object<Subject> {
   };
 }
 
-class TableOfContents extends Realm.Object<TableOfContents> {
+export class TableOfContents extends Realm.Object<TableOfContents> {
   _id: Realm.BSON.ObjectId = new Realm.BSON.ObjectId();
   title!: string;
   level!: number;
@@ -74,5 +134,3 @@ class TableOfContents extends Realm.Object<TableOfContents> {
     },
   };
 }
-
-export {Author, Link, Publisher, Subject, TableOfContents};
