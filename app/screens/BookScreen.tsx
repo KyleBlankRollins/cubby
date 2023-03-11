@@ -1,82 +1,53 @@
 import React from 'react';
-import {FlatList, Image, ListRenderItem, StyleSheet, View} from 'react-native';
-
-import {useNavigation} from '@react-navigation/native';
+import {StyleSheet, View, Image, ScrollView} from 'react-native';
 
 import {AppButton} from '../baseComponents/AppButton';
 import {AppText} from '../baseComponents/AppText';
-import {bookAPIRaw} from '../models/bookAPIRaw';
+import {AppHeaderText} from '../baseComponents/AppHeaderText';
+
+import {RealmContext} from '../models';
+import {Book} from '../models/Book';
+const {useRealm, useQuery} = RealmContext;
 
 type BookScreenProps = {
-  bookInfo: bookAPIRaw;
+  bookId: string;
 };
 
 export const BookScreen: React.FC<BookScreenProps> = props => {
-  const navigation = useNavigation();
+  const id = JSON.parse(props.bookId);
+  const realm = useRealm();
+  const result = useQuery(Book);
+  const book = result.filtered(`_id == oid(${id})`)[0];
 
   return (
-    <View style={styles.bookContainer}>
-      <View>
-        {props.bookInfo.cover && (
-          <Image
-            style={styles.image}
-            source={{
-              uri: props.bookInfo.cover!.medium,
-            }}
-          />
-        )}
-        {/* TODO: Need to get section id here and pass it to AddBook so it's easier to query the section. */}
-        {/* TODO: Re-evaluate how to add. Need an "AddBookForm"
-        that's handled similarly to "AddCubbyForm". */}
-        {/* <AppButton
-          title="Add book to Cubby"
-          onPress={() => {
-            navigation.navigate('Add a book', {
-              section: JSON.stringify(sectionInfo),
-              book: JSON.stringify(bookInfo),
-            });
+    <View>
+      <AppHeaderText level={3}>{book.title}</AppHeaderText>
+      <AppText>{book}</AppText>
+
+      {/* TODO: Add placeholder for books with no cover */}
+      {book.cover && book.cover.medium && (
+        <Image
+          style={{
+            resizeMode: 'cover',
+            height: 200,
+            width: 125,
+            marginRight: 10,
           }}
-        /> */}
-      </View>
-      <View>
-        <AppText>{props.bookInfo.title}</AppText>
-
-        <AppText>Author(s)</AppText>
-        <FlatList
-          data={props.bookInfo.authors}
-          renderItem={({item}) => <Item name={item.name} />}
-          keyExtractor={author => author.name}
+          source={{
+            uri: book.cover.medium,
+          }}
         />
+      )}
 
-        <AppText>Subjects</AppText>
-        <FlatList
-          data={props.bookInfo.subjects}
-          renderItem={({item}) => <Item name={item.name} />}
-          keyExtractor={subject => subject.url}
-        />
-      </View>
+      <AppButton
+        title="Delete book"
+        onPress={() => {
+          //TODO: add confirmation
+          realm.write(() => {
+            realm.delete(book);
+          });
+        }}
+      />
     </View>
   );
 };
-
-type ItemProps = {name: string};
-
-const Item = ({name}: ItemProps) => (
-  <View>
-    <AppText>{name}</AppText>
-  </View>
-);
-
-const styles = StyleSheet.create({
-  bookContainer: {
-    flex: 1,
-    flexDirection: 'row',
-    margin: 10,
-  },
-  image: {
-    resizeMode: 'cover',
-    height: 200,
-    width: 125,
-    marginRight: 10,
-  },
-});

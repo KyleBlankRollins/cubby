@@ -19,7 +19,7 @@ type AppTextProps = {
   level: headingLevel;
   customStyle?: TextStyle;
   children: React.ReactNode;
-  numberOfLines: number;
+  numberOfLines?: number;
 };
 
 export const AppHeaderText: React.FC<AppTextProps> = props => {
@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   heading4: {
-    fontSize: 20,
+    fontSize: 16,
     fontFamily: 'Merriweather-Black',
     marginVertical: 10,
   },

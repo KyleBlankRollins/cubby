@@ -23,7 +23,7 @@ export const CubbyScreen: React.FC<CubbyScreenNavigationProp> = () => {
   const realm = useRealm();
 
   return (
-    <View style={{flex: 1}}>
+    <View style={styles.cubbyContatiner}>
       {/* TODO: handle null cubby case */}
       <AppText>{cubby!.description}</AppText>
 
@@ -68,6 +68,10 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     justifyContent: 'center',
     marginVertical: 8,
+  },
+  cubbyContainer: {
+    marginHorizontal: 14,
+    marginVertical: 10,
   },
   containerFlex: {
     display: 'flex',

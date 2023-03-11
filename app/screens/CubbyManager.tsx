@@ -55,7 +55,6 @@ export const CubbyManager: React.FC<HomeScreenNavigationProp> = () => {
     [realm],
   );
 
-  // TODO: Show a confirm delete modal before deleting
   const handleDeleteCubby = useCallback(
     (cubby: Cubby & Realm.Object): void => {
       realm.write(() => {
@@ -109,6 +108,8 @@ export const CubbyManager: React.FC<HomeScreenNavigationProp> = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    marginHorizontal: 14,
+    marginVertical: 10,
     justifyContent: 'center',
     // alignItems: 'center',
   },

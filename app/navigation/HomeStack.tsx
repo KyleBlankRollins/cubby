@@ -36,6 +36,18 @@ const HomeStackNavigator = () => {
           },
         }}
       />
+      <HomeStack.Screen
+        name="AddBookModal"
+        component={AddBookForm} // TODO: Figure out why TS is mad
+        options={{
+          presentation: 'modal',
+          headerShown: false,
+          contentStyle: {
+            backgroundColor: 'transparent',
+            opacity: 0.99,
+          },
+        }}
+      />
     </HomeStack.Navigator>
   );
 };

@@ -21,7 +21,7 @@ export const AppButton = React.memo<AppButtonProps>(
       backgroundColor: options?.bgColor ? options.bgColor : '#5A527D',
     };
     const textSize = {
-      fontSize: options?.largeText ? 24 : 12,
+      fontSize: options?.largeText ? 24 : 18,
     };
     const buttonWidth = options?.fullWidth ? styles.fullWidth : styles.fitWidth;
 

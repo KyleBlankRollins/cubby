@@ -1,15 +1,23 @@
-import React, {useState} from 'react';
+import React, {useState, useCallback} from 'react';
 import {Alert, SafeAreaView, StyleSheet, TextInput, View} from 'react-native';
 
 import {AppButton} from '../baseComponents/AppButton';
 import {AppText} from '../baseComponents/AppText';
 import {BookScreenNavigationProp} from '../navigation/types';
-import {BookScreen} from './BookScreen';
+import {BookOverview} from '../components/BookOverview';
 
-// TODO: TypeScriptify this component
+import {Cubby} from '../models/Cubby';
+import {Section} from '../models/Section';
+import {RealmContext} from '../models';
+
+const {useRealm} = RealmContext;
+
 export const FindBookScreen: React.FC<BookScreenNavigationProp> = () => {
+  const realm = useRealm();
+  const [bookFormVisible, setBookFormVisible] = useState(false);
+  const [opacityLevel, setOpacityLevel] = useState(1);
   const [isbn, setIsbn] = useState('');
-  const [bookInfo, setBookInfo] = useState('');
+  const [bookInfo, setBookInfo] = useState(undefined);
   const [findBookButtonText, setFindBookButtonText] = useState('Find book');
 
   // TODO: rewrite as serverless function
@@ -25,7 +33,7 @@ export const FindBookScreen: React.FC<BookScreenNavigationProp> = () => {
       .then(jsonString => JSON.parse(jsonString))
       .then(jsonObject => {
         setBookInfo(jsonObject[`ISBN:${isbn}`]);
-
+        setIsbn('');
         setFindBookButtonText('Find another book');
 
         return;
@@ -35,8 +43,50 @@ export const FindBookScreen: React.FC<BookScreenNavigationProp> = () => {
       });
   };
 
+  const handleAddBook = useCallback(
+    (description: string, name: string): void => {
+      // TODO: Add alert about needing these.
+      if (!description || !name) {
+        return;
+      }
+
+      realm.write(() => {
+        const defaultSection: Section = realm.create(
+          'Section',
+          Section.generate('default section', {
+            main: '#DDD382',
+            highlight: '#D65F28',
+          }),
+        );
+
+        const newCubby: Cubby = realm.create(
+          'Cubby',
+          Cubby.generate(name, description),
+        );
+
+        newCubby.sections.push(defaultSection);
+
+        handleModalClose();
+
+        return newCubby;
+      });
+    },
+    [realm],
+  );
+
+  const handleModalClose = () => {
+    setBookFormVisible(false);
+    setOpacityLevel(1);
+  };
+
+  const handleModalOpacity = () => {
+    return {
+      opacity: opacityLevel,
+    };
+  };
+
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, handleModalOpacity()]}>
       <View>
         <AppText>Enter a book's ISBN and get information about it!</AppText>
         <AppText selectable={true}>
@@ -60,7 +110,14 @@ export const FindBookScreen: React.FC<BookScreenNavigationProp> = () => {
         />
       </View>
 
-      {bookInfo && <BookScreen bookInfo={bookInfo} />}
+      {bookInfo && (
+        <BookOverview
+          bookInfo={bookInfo}
+          onSubmit={handleAddBook}
+          onClose={handleModalClose}
+          visible={bookFormVisible}
+        />
+      )}
     </SafeAreaView>
   );
 };
@@ -70,8 +127,11 @@ const styles = StyleSheet.create({
     margin: 12,
     borderWidth: 1,
     padding: 10,
+    fontSize: 20,
   },
   container: {
     flex: 1,
+    marginHorizontal: 14,
+    marginVertical: 10,
   },
 });
