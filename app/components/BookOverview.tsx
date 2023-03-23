@@ -1,24 +1,29 @@
 import React from 'react';
-import {FlatList, Image, StyleSheet, View} from 'react-native';
+import {FlatList, Image, Pressable, StyleSheet, View} from 'react-native';
 
 import {useNavigation} from '@react-navigation/native';
 
+import {HomeScreenNavigationProp} from '../navigation/types';
 import {AppButton} from '../baseComponents/AppButton';
-import {AddBookForm} from './AddBookForm';
 import {AppText} from '../baseComponents/AppText';
 import {AppHeaderText} from '../baseComponents/AppHeaderText';
 import {bookAPIRaw} from '../models/bookAPIRaw';
 
 type BookOverviewProps = {
   bookInfo: bookAPIRaw;
-  onSubmit: (description: string, name: string) => void;
-  onClose: () => void;
-  visible: boolean;
 };
 
 export const BookOverview: React.FC<BookOverviewProps> = props => {
+  const navigation = useNavigation<HomeScreenNavigationProp>();
+
   return (
-    <View style={styles.bookContainer}>
+    <Pressable
+      style={styles.bookContainer}
+      onPress={() => {
+        navigation.navigate('BookScreen', {
+          book: props.bookInfo,
+        });
+      }}>
       <View>
         {props.bookInfo.cover && (
           <Image
@@ -28,21 +33,6 @@ export const BookOverview: React.FC<BookOverviewProps> = props => {
             }}
           />
         )}
-        <AddBookForm
-          bookInfo={props.bookInfo}
-          onSubmit={props.onSubmit}
-          onClose={props.onClose}
-          visible={props.visible}
-        />
-        {/* TODO: Add a View Details button that goes to BookScreen and adds BookInfo as a prop. */}
-        {/* <AppButton
-          title="More details"
-          onPress={() => {
-            navigation.navigate('BookScreen', {
-              bookInfo: bookInfo,
-            });
-          }}
-        /> */}
       </View>
       <View>
         <AppHeaderText level={3}>{props.bookInfo.title}</AppHeaderText>
@@ -61,7 +51,7 @@ export const BookOverview: React.FC<BookOverviewProps> = props => {
 
         <AppText>{props.bookInfo.number_of_pages} pages</AppText>
       </View>
-    </View>
+    </Pressable>
   );
 };
 

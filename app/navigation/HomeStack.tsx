@@ -6,6 +6,8 @@ import CubbyScreen from '../screens/CubbyScreen';
 
 import {HomeStackNavigatorParamList} from './types';
 import {AddCubbyForm} from '../components/AddCubbyForm';
+import {AddBookForm} from '../components/AddBookForm';
+import {BookScreen} from '../screens/BookScreen';
 
 const HomeStack = createNativeStackNavigator<HomeStackNavigatorParamList>();
 
@@ -22,6 +24,13 @@ const HomeStackNavigator = () => {
         component={CubbyScreen} // TODO: Figure out why TS is mad
         options={({route}) => ({
           title: route.params.name,
+        })}
+      />
+      <HomeStack.Screen
+        name="BookScreen"
+        component={BookScreen} // TODO: Figure out why TS is mad
+        options={({route}) => ({
+          headerShown: false,
         })}
       />
       <HomeStack.Screen

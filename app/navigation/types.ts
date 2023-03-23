@@ -1,6 +1,8 @@
 import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import type {RouteProp} from '@react-navigation/native';
 import {Cubby} from '../models/Cubby';
+import {Book} from '../models/Book';
+import {bookAPIRaw} from '../models/bookAPIRaw';
 
 export type HomeStackNavigatorParamList = {
   CubbyManager: {
@@ -9,6 +11,9 @@ export type HomeStackNavigatorParamList = {
   CubbyScreen: {
     _id: string;
     name: string;
+  };
+  BookScreen: {
+    book: Book | bookAPIRaw;
   };
   AddCubbyModal: {};
   AddBookModal: {};
@@ -34,6 +39,11 @@ export type BookScreenNavigationProp = NativeStackNavigationProp<
   'CubbyManager' // All route possibilities for CubbyManager. Undefined means access to all routes.
 >;
 
+export type FindBookScreenNavigationProp = NativeStackNavigationProp<
+  HomeStackNavigatorParamList,
+  'CubbyManager' // All route possibilities for CubbyManager. Undefined means access to all routes.
+>;
+
 // export type HomeScreenRouteProp = RouteProp<
 //   HomeStackNavigatorParamList,
 //   'CubbyManager'
@@ -42,4 +52,9 @@ export type BookScreenNavigationProp = NativeStackNavigationProp<
 export type CubbyScreenRouteProp = RouteProp<
   HomeStackNavigatorParamList,
   'CubbyScreen'
+>;
+
+export type BookScreenRouteProp = RouteProp<
+  HomeStackNavigatorParamList,
+  'BookScreen'
 >;

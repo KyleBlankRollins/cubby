@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useMemo} from 'react';
 import {
   Modal,
   View,
@@ -7,17 +7,23 @@ import {
   Platform,
   StyleSheet,
   useColorScheme,
+  FlatList,
 } from 'react-native';
 
 import {buttonStyles} from '../styles/button';
 import {lightStyles, darkStyles} from '../styles/theme';
 import {AppText} from '../baseComponents/AppText';
 
+import {Cubby} from '../models/Cubby';
+import {Book} from '../models/Book';
 import {bookAPIRaw} from '../models/bookAPIRaw';
+import {RealmContext} from '../models';
+
+const {useQuery} = RealmContext;
 
 type AddBookFormProps = {
-  bookInfo: bookAPIRaw;
-  onSubmit: (description: string, name: string) => void;
+  bookInfo: Book | bookAPIRaw;
+  onSubmit: (destinationCubbyId: Realm.BSON.ObjectId | undefined) => void;
   onClose: () => void;
   visible: boolean;
 };
@@ -30,22 +36,39 @@ export const AddBookForm: React.FC<AddBookFormProps> = ({
 }) => {
   // TODO: Change this to add dropdown or tap selection for destination cubby.
   // Ignore sections for now. Put all books in the default section.
-  const [description, setDescription] = useState('');
-  const [name, setName] = useState('');
+  const [destinationCubby, setDestinationCubby] = useState('No Cubby selected');
+  const [destinationCubbyId, setDestinationCubbyId] =
+    useState<Realm.BSON.ObjectId>();
 
   const isDarkMode = useColorScheme() === 'dark';
   const themeStyles = isDarkMode ? darkStyles : lightStyles;
 
   const handleSubmit = () => {
-    onSubmit(description, name);
+    onSubmit(destinationCubbyId);
 
     // Reset state
-    setDescription('');
-    setName('');
+    setDestinationCubby('');
   };
 
   const handleClose = () => {
     onClose();
+  };
+
+  // Get all cubbies in the realm
+  const result = useQuery(Cubby);
+  const cubbies = useMemo(() => result.sorted('name'), [result]);
+
+  const renderItem = (cubbyName: string, cubbyId: Realm.BSON.ObjectId) => {
+    return (
+      <Pressable
+        style={[styles.cubbySelector, themeStyles.surface3]}
+        onPress={() => {
+          setDestinationCubby(cubbyName);
+          setDestinationCubbyId(cubbyId);
+        }}>
+        <AppText> {cubbyName} </AppText>
+      </Pressable>
+    );
   };
 
   return (
@@ -57,7 +80,16 @@ export const AddBookForm: React.FC<AddBookFormProps> = ({
         handleClose();
       }}>
       <View style={[styles.form, themeStyles.surface2]}>
-        <View style={styles.inputs}>
+        <View style={styles.container}>
+          <AppText>{destinationCubby}</AppText>
+          <AppText>Add to which Cubby?</AppText>
+          <FlatList
+            data={cubbies}
+            keyExtractor={cubby => cubby._id.toString()}
+            renderItem={({item}) => renderItem(item.name, item._id)}
+          />
+        </View>
+        {/* <View style={styles.inputs}>
           <TextInput
             value={name}
             placeholder="Cubby name"
@@ -85,6 +117,7 @@ export const AddBookForm: React.FC<AddBookFormProps> = ({
             ]}
           />
         </View>
+         */}
         <View style={styles.verticalButtonGroup}>
           <Pressable onPress={handleSubmit} style={styles.submit}>
             <AppText>＋</AppText>
@@ -101,7 +134,7 @@ export const AddBookForm: React.FC<AddBookFormProps> = ({
 const styles = StyleSheet.create({
   form: {
     flexDirection: 'row',
-    height: 150,
+    height: 250,
     width: '100%',
     position: 'absolute',
     bottom: '40%',
@@ -110,8 +143,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
     // ...shadows,
   },
-  inputs: {
+  container: {
     flex: 1,
+  },
+  cubbySelector: {
+    borderWidth: 2,
+    borderColor: 'red',
   },
   textInput: {
     paddingHorizontal: 15,
