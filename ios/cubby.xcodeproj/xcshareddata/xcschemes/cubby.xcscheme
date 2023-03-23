@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-               BuildableName = "testProject.app"
-               BlueprintName = "testProject"
-               ReferencedContainer = "container:testProject.xcodeproj">
+               BuildableName = "cubby.app"
+               BlueprintName = "cubby"
+               ReferencedContainer = "container:cubby.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "00E356ED1AD99517003FC87E"
-               BuildableName = "testProjectTests.xctest"
-               BlueprintName = "testProjectTests"
-               ReferencedContainer = "container:testProject.xcodeproj">
+               BuildableName = "cubbyTests.xctest"
+               BlueprintName = "cubbyTests"
+               ReferencedContainer = "container:cubby.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -55,9 +55,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "testProject.app"
-            BlueprintName = "testProject"
-            ReferencedContainer = "container:testProject.xcodeproj">
+            BuildableName = "cubby.app"
+            BlueprintName = "cubby"
+            ReferencedContainer = "container:cubby.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -72,9 +72,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "testProject.app"
-            BlueprintName = "testProject"
-            ReferencedContainer = "container:testProject.xcodeproj">
+            BuildableName = "cubby.app"
+            BlueprintName = "cubby"
+            ReferencedContainer = "container:cubby.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
