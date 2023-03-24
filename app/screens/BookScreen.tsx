@@ -33,12 +33,12 @@ export const BookScreen: React.FC<BookScreenNavigationProp> = () => {
   const [opacityLevel, setOpacityLevel] = useState(1);
 
   const route = useRoute<BookScreenRouteProp>();
-  const {book} = route.params;
+  const {bookInfo} = route.params;
 
   // const id = JSON.parse(props.bookId);
   const realm = useRealm();
   const realmBook: Realm.Results<Book> = useQuery(Book).filtered(
-    `title == "${book.title}"`,
+    `title == "${bookInfo.title}"`,
   );
   // const book = result.filtered(`_id == oid(${id})`)[0];
 
@@ -66,51 +66,51 @@ export const BookScreen: React.FC<BookScreenNavigationProp> = () => {
         authors: [],
         cover: {},
         ebooks: [],
-        // PICK UP HERE: finish creating embedded objects
+        // TODO: finish creating embedded objects (just TOC left)
         // think about how to streamline this.
         // after constructedBook is complete, can pass to
         // `realm.create('Book')`.
         excerpts: [],
         identifiers: [],
-        key: book.key,
+        key: bookInfo.key,
         links: [],
-        numberOfPages: book.number_of_pages,
-        notes: book.notes,
-        publishDate: book.publishDate,
+        numberOfPages: bookInfo.number_of_pages,
+        notes: bookInfo.notes,
+        publishDate: bookInfo.publishDate,
         publishers: [],
         subjects: [],
-        subtitle: book.subtitle,
+        subtitle: bookInfo.subtitle,
         tableOfContents: [],
-        title: book.title,
-        url: book.url,
+        title: bookInfo.title,
+        url: bookInfo.url,
       };
 
       // iterate authors and create new Author Realm objects
-      for (let index = 0; index < book.authors.length; index++) {
+      for (let index = 0; index < bookInfo.authors.length; index++) {
         const newAuthor: Author = realm.create('Author', {
-          name: book.authors[index].name,
-          url: book.authors[index].url,
+          name: bookInfo.authors[index].name,
+          url: bookInfo.authors[index].url,
         });
 
         constructedBook.authors.push(newAuthor);
       }
 
       // if cover object exists, create new Cover Realm object
-      if (book.cover) {
+      if (bookInfo.cover) {
         const newCover: Cover = realm.create('Cover', {
-          large: book.cover.large,
-          medium: book.cover.medium,
-          small: book.cover.small,
+          large: bookInfo.cover.large,
+          medium: bookInfo.cover.medium,
+          small: bookInfo.cover.small,
         });
 
         constructedBook.cover = newCover;
       }
 
       // iterate ebooks and create new Ebook Realm objects
-      if (book.ebooks && book.ebooks.length) {
-        for (let index = 0; index < book.ebooks.length; index++) {
+      if (bookInfo.ebooks && bookInfo.ebooks.length) {
+        for (let index = 0; index < bookInfo.ebooks.length; index++) {
           const newEbook: Ebook = realm.create('Ebook', {
-            previewUrl: book.ebooks[index].preview_url,
+            previewUrl: bookInfo.ebooks[index].preview_url,
           });
 
           constructedBook.ebooks.push(newEbook);
@@ -118,11 +118,11 @@ export const BookScreen: React.FC<BookScreenNavigationProp> = () => {
       }
 
       // iterate excerpts and create new Excerpt Realm objects
-      if (book.excerpts && book.excerpts.length) {
-        for (let index = 0; index < book.excerpts.length; index++) {
+      if (bookInfo.excerpts && bookInfo.excerpts.length) {
+        for (let index = 0; index < bookInfo.excerpts.length; index++) {
           const newExcerpt: Excerpt = realm.create('Excerpt', {
-            comment: book.excerpts[index].comment,
-            text: book.excerpts[index].text,
+            comment: bookInfo.excerpts[index].comment,
+            text: bookInfo.excerpts[index].text,
           });
 
           constructedBook.excerpts.push(newExcerpt);
@@ -130,15 +130,15 @@ export const BookScreen: React.FC<BookScreenNavigationProp> = () => {
       }
 
       // iterate identifiers and create new Identifier Realm objects
-      if (book.identifiers) {
+      if (bookInfo.identifiers) {
         for (
           let index = 0;
-          index < Object.keys(book.identifiers).length;
+          index < Object.keys(bookInfo.identifiers).length;
           index++
         ) {
           const newIdentifier: Identifier = realm.create('Identifier', {
-            identifierType: Object.keys(book.identifiers)[index],
-            identifierValue: Object.keys(book.identifiers)[index][0],
+            identifierType: Object.keys(bookInfo.identifiers)[index],
+            identifierValue: Object.keys(bookInfo.identifiers)[index][0],
           });
 
           constructedBook.identifiers.push(newIdentifier);
@@ -146,11 +146,11 @@ export const BookScreen: React.FC<BookScreenNavigationProp> = () => {
       }
 
       // iterate links and create new Link Realm objects
-      if (book.links && book.links.length) {
-        for (let index = 0; index < book.links.length; index++) {
+      if (bookInfo.links && bookInfo.links.length) {
+        for (let index = 0; index < bookInfo.links.length; index++) {
           const newLink: Link = realm.create('Link', {
-            url: book.links[index].url,
-            title: book.links[index].title,
+            url: bookInfo.links[index].url,
+            title: bookInfo.links[index].title,
           });
 
           constructedBook.links.push(newLink);
@@ -158,10 +158,10 @@ export const BookScreen: React.FC<BookScreenNavigationProp> = () => {
       }
 
       // iterate publishers and create new Publisher Realm objects
-      if (book.publishers && book.publishers.length) {
-        for (let index = 0; index < book.publishers.length; index++) {
+      if (bookInfo.publishers && bookInfo.publishers.length) {
+        for (let index = 0; index < bookInfo.publishers.length; index++) {
           const newPublisher: Publisher = realm.create('Publisher', {
-            name: book.publishers[index].name,
+            name: bookInfo.publishers[index].name,
           });
 
           constructedBook.publishers.push(newPublisher);
@@ -169,11 +169,11 @@ export const BookScreen: React.FC<BookScreenNavigationProp> = () => {
       }
 
       // iterate subjects and create new Subject Realm objects
-      if (book.subjects && book.subjects.length) {
-        for (let index = 0; index < book.subjects.length; index++) {
+      if (bookInfo.subjects && bookInfo.subjects.length) {
+        for (let index = 0; index < bookInfo.subjects.length; index++) {
           const newSubject: Subject = realm.create('Subject', {
-            name: book.subjects[index].name,
-            url: book.subjects[index].url,
+            name: bookInfo.subjects[index].name,
+            url: bookInfo.subjects[index].url,
           });
 
           constructedBook.subjects.push(newSubject);
@@ -181,14 +181,14 @@ export const BookScreen: React.FC<BookScreenNavigationProp> = () => {
       }
 
       // iterate tableOfContents and create new TableOfContents Realm objects
-      // if (book.tableOfContents && book.tableOfContents.length) {
-      //   for (let index = 0; index < book.tableOfContents.length; index++) {
+      // if (bookInfo.tableOfContents && bookInfo.tableOfContents.length) {
+      //   for (let index = 0; index < bookInfo.tableOfContents.length; index++) {
       //     const newTableOfContents: TableOfContents = realm.create(
       //       'TableOfContents',
       //       {
-      //         level: book.tableOfContents[index].level,
-      //         title: book.tableOfContents[index].title,
-      //         pagenumb: book.tableOfContents[index].pagenumb,
+      //         level: bookInfo.tableOfContents[index].level,
+      //         title: bookInfo.tableOfContents[index].title,
+      //         pagenumb: bookInfo.tableOfContents[index].pagenumb,
       //       },
       //     );
 
@@ -205,22 +205,22 @@ export const BookScreen: React.FC<BookScreenNavigationProp> = () => {
       //   const newBook: Book = realm.create(
       //     'Book',
       //     Book.generate({
-      // authors: book.authors,
-      // cover: book.cover,
-      // ebooks: book.ebooks,
-      // excerpts: book.excerpts,
-      // identifiers: book.identifiers,
-      // key: book.key,
-      // links: book.links,
-      // numberOfPages: book.number_of_pages,
-      // notes: book.notes,
-      // publishDate: book.publishDate,
-      // publishers: book.publishers,
-      // subjects: book.subjects,
-      // subtitle: book.subtitle,
-      // tableOfContents: book.table_of_contents,
-      // title: book.title,
-      // url: book.url,
+      // authors: bookInfo.authors,
+      // cover: bookInfo.cover,
+      // ebooks: bookInfo.ebooks,
+      // excerpts: bookInfo.excerpts,
+      // identifiers: bookInfo.identifiers,
+      // key: bookInfo.key,
+      // links: bookInfo.links,
+      // numberOfPages: bookInfo.number_of_pages,
+      // notes: bookInfo.notes,
+      // publishDate: bookInfo.publishDate,
+      // publishers: bookInfo.publishers,
+      // subjects: bookInfo.subjects,
+      // subtitle: bookInfo.subtitle,
+      // tableOfContents: bookInfo.table_of_contents,
+      // title: bookInfo.title,
+      // url: bookInfo.url,
       //     }),
       //   );
 
@@ -237,18 +237,18 @@ export const BookScreen: React.FC<BookScreenNavigationProp> = () => {
 
   return (
     <ScrollView style={[styles.container, handleModalOpacity()]}>
-      <AppHeaderText level={2}>{book.title}</AppHeaderText>
+      <AppHeaderText level={2}>{bookInfo.title}</AppHeaderText>
       {/* TODO: add description when available */}
       <AppText>If book description, put it here.</AppText>
 
-      <AppText>{JSON.stringify(book, null, 2)}</AppText>
+      <AppText>{JSON.stringify(bookInfo, null, 2)}</AppText>
 
       {/* TODO: Add placeholder for books with no cover */}
-      {book.cover && book.cover.medium && (
+      {bookInfo.cover && bookInfo.cover.medium && (
         <Image
           style={styles.image}
           source={{
-            uri: book.cover.medium,
+            uri: bookInfo.cover.medium,
           }}
         />
       )}
@@ -267,18 +267,19 @@ export const BookScreen: React.FC<BookScreenNavigationProp> = () => {
       />
 
       {/* TODO: Only show if it's in a cubby. */}
+      {/* TODO: Make it delete the cubby book. */}
       <AppButton
         title="Delete book"
         onPress={() => {
           //TODO: add confirmation
           realm.write(() => {
-            realm.delete(book);
+            realm.delete();
           });
         }}
       />
 
       <AddBookForm
-        bookInfo={book}
+        bookInfo={bookInfo}
         onSubmit={handleAddBook}
         onClose={handleModalClose}
         visible={bookFormVisible}

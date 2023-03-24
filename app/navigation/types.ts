@@ -13,7 +13,7 @@ export type HomeStackNavigatorParamList = {
     name: string;
   };
   BookScreen: {
-    book: Book | bookAPIRaw;
+    bookInfo: any;
   };
   AddCubbyModal: {};
   AddBookModal: {};

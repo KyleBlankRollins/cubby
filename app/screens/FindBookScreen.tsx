@@ -1,5 +1,12 @@
 import React, {useState, useCallback} from 'react';
-import {Alert, SafeAreaView, StyleSheet, TextInput, View} from 'react-native';
+import {
+  Alert,
+  FlatList,
+  SafeAreaView,
+  StyleSheet,
+  TextInput,
+  View,
+} from 'react-native';
 
 import {AppButton} from '../baseComponents/AppButton';
 import {AppText} from '../baseComponents/AppText';
@@ -13,28 +20,36 @@ import {RealmContext} from '../models';
 const {useRealm} = RealmContext;
 
 export const FindBookScreen: React.FC<FindBookScreenNavigationProp> = () => {
-  const realm = useRealm();
-  const [isbn, setIsbn] = useState('');
-  const [bookInfo, setBookInfo] = useState(undefined);
+  const [gBookId, setgBookId] = useState('');
+  const [query, setQuery] = useState('');
+  const [result, setResult] = useState();
   const [findBookButtonText, setFindBookButtonText] = useState('Find book');
 
   // TODO: rewrite as serverless function
-  // TODO: Extract this to its own component/file.
-  const requestBook = async () => {
-    // TODO: Test for malformed ISBNs before submitting request.
-    // TODO: If important info is missing, check the Google Books API.
-    // Request book info from Book API: https://openlibrary.org/dev/docs/api/books
-    await fetch(
-      `https://openlibrary.org/api/books?bibkeys=ISBN:${isbn}&jscmd=data&format=json`,
-    )
-      // fetch(`https://openlibrary.org/isbn/${isbn}.json`)
-      .then(response => response.json())
-      .then(response => JSON.stringify(response))
-      .then(jsonString => JSON.parse(jsonString))
-      .then(jsonObject => {
-        setBookInfo(jsonObject[`ISBN:${isbn}`]);
-        setIsbn('');
+  const requestBookByTitle = async () => {
+    const SHA1 = '5E8F16062EA3CD2C4A0D547876BAA6F38CABF625';
+    const PACKAGE_NAME = 'com.cubby';
+    const HEADERS = {
+      'Content-Type': 'application/json',
+      'X-Android-Package': PACKAGE_NAME,
+      'X-Android-Cert': SHA1,
+    };
+    const FETCH_LINK = `https://www.googleapis.com/books/v1/volumes?q=intitle:${query}&projection=lite&key=AIzaSyBDmJ0rDzfzU6WrfCpsPhWDoiiVsHy5hNM`;
+
+    await fetch(FETCH_LINK, {headers: HEADERS})
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error: ${response.status}`);
+        }
+
+        return response.json();
+      })
+      .then(data => {
+        setResult(data.items);
+        setQuery('');
         setFindBookButtonText('Find another book');
+
+        // TODO: check if gBookId matches a book _id in realm.
 
         return;
       })
@@ -46,29 +61,38 @@ export const FindBookScreen: React.FC<FindBookScreenNavigationProp> = () => {
   return (
     <SafeAreaView style={styles.container}>
       <View>
-        <AppText>Enter a book's ISBN and get information about it!</AppText>
-        <AppText selectable={true}>
-          {' '}
-          For example:
-          <AppText>9781250214713</AppText>
-        </AppText>
+        {/* TODO: Add different search options. Like by author. */}
+        {!result && <AppText>Search for a book by its title</AppText>}
+
         <TextInput
           style={styles.input}
-          onChangeText={setIsbn}
-          value={isbn}
-          placeholder="9781250214713"
-          keyboardType="numeric"
+          onChangeText={setQuery}
+          value={query}
+          placeholder="Example: Howl's Moving Castle"
+          // keyboardType="numeric"
         />
 
         <AppButton
           title={findBookButtonText}
           onPress={() => {
-            requestBook();
+            requestBookByTitle();
           }}
         />
       </View>
 
-      {bookInfo && <BookOverview bookInfo={bookInfo} />}
+      {result && result.length && (
+        <FlatList
+          data={result}
+          keyExtractor={result => result.id.toString()}
+          renderItem={({item}) => {
+            return <BookOverview bookInfo={item} />;
+          }}
+        />
+      )}
+
+      {/* TODO: If book is already in realm, pass the Book object. If not, pass basic info. */}
+      {/* TODO: add prop for `isInRealm`. */}
+      {/* {bookInfo && <BookOverview bookInfo={result} />} */}
     </SafeAreaView>
   );
 };

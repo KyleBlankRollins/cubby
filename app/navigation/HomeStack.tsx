@@ -29,9 +29,7 @@ const HomeStackNavigator = () => {
       <HomeStack.Screen
         name="BookScreen"
         component={BookScreen} // TODO: Figure out why TS is mad
-        options={({route}) => ({
-          headerShown: false,
-        })}
+        options={{headerShown: false}}
       />
       <HomeStack.Screen
         name="AddCubbyModal"

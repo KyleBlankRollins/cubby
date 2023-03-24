@@ -12,7 +12,7 @@ import {
 } from './EmbeddedObjects';
 
 export class Book extends Realm.Object<Book> {
-  _id: Realm.BSON.ObjectId = new Realm.BSON.ObjectId();
+  _id!: string;
   authors!: Realm.List<Author>;
   cover?: Cover;
   ebooks?: Realm.List<Ebook>;
@@ -34,7 +34,7 @@ export class Book extends Realm.Object<Book> {
   static schema = {
     name: 'Book',
     properties: {
-      _id: 'objectId',
+      _id: 'string',
       authors: {type: 'list', objectType: 'Author'},
       cover: 'Cover?',
       ebooks: {type: 'list', objectType: 'Ebook'},
@@ -63,6 +63,7 @@ export class Book extends Realm.Object<Book> {
 
   static generate(
     bookInfo: {
+      id: string;
       authors: Realm.List<Author>;
       cover?: Cover;
       ebooks?: Realm.List<Ebook>;
@@ -83,7 +84,7 @@ export class Book extends Realm.Object<Book> {
     userId?: Realm.BSON.ObjectId | undefined,
   ) {
     return {
-      _id: new Realm.BSON.ObjectId(),
+      _id: bookInfo.id,
       authors: bookInfo.authors,
       cover: bookInfo.cover,
       ebooks: bookInfo.ebooks,

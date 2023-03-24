@@ -10,46 +10,44 @@ import {AppHeaderText} from '../baseComponents/AppHeaderText';
 import {bookAPIRaw} from '../models/bookAPIRaw';
 
 type BookOverviewProps = {
-  bookInfo: bookAPIRaw;
+  // TODO: Update this when I have more info.
+  bookInfo: any;
 };
 
-export const BookOverview: React.FC<BookOverviewProps> = props => {
+export const BookOverview: React.FC<BookOverviewProps> = ({bookInfo}) => {
   const navigation = useNavigation<HomeScreenNavigationProp>();
+  const book = bookInfo.volumeInfo;
 
   return (
     <Pressable
       style={styles.bookContainer}
       onPress={() => {
         navigation.navigate('BookScreen', {
-          book: props.bookInfo,
+          book: book,
         });
       }}>
       <View>
-        {props.bookInfo.cover && (
+        {book.imageLinks && (
           <Image
             style={styles.image}
             source={{
-              uri: props.bookInfo.cover!.medium,
+              uri: book.imageLinks!.thumbnail,
             }}
           />
         )}
       </View>
       <View>
-        <AppHeaderText level={3}>{props.bookInfo.title}</AppHeaderText>
+        <AppHeaderText level={3}>{book.title}</AppHeaderText>
 
         <FlatList
-          data={props.bookInfo.authors}
-          renderItem={({item}) => <Item name={item.name} />}
-          keyExtractor={author => author.name}
+          data={book.authors}
+          renderItem={({item}) => <Item name={item} />}
+          keyExtractor={author => author}
         />
 
-        <FlatList
-          data={props.bookInfo.publishers}
-          renderItem={({item}) => <Item name={item.name} />}
-          keyExtractor={author => author.name}
-        />
-
-        <AppText>{props.bookInfo.number_of_pages} pages</AppText>
+        <AppText>{book.publisher}</AppText>
+        <AppText>{book.publishDate}</AppText>
+        <AppText>{book.description}</AppText>
       </View>
     </Pressable>
   );
