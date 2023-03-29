@@ -16,10 +16,13 @@ import {BookOverview} from '../components/BookOverview';
 import {Cubby} from '../models/Cubby';
 import {Section} from '../models/Section';
 import {RealmContext} from '../models';
+import {RawBook} from '../models/gBookApiRaw';
+import {Book} from '../models/Book';
 
 const {useRealm} = RealmContext;
 
 export const FindBookScreen: React.FC<FindBookScreenNavigationProp> = () => {
+  const realm = useRealm();
   const [gBookId, setgBookId] = useState('');
   const [query, setQuery] = useState('');
   const [result, setResult] = useState();
@@ -34,7 +37,8 @@ export const FindBookScreen: React.FC<FindBookScreenNavigationProp> = () => {
       'X-Android-Package': PACKAGE_NAME,
       'X-Android-Cert': SHA1,
     };
-    const FETCH_LINK = `https://www.googleapis.com/books/v1/volumes?q=intitle:${query}&projection=lite&key=AIzaSyBDmJ0rDzfzU6WrfCpsPhWDoiiVsHy5hNM`;
+    const APIKEY = 'AIzaSyBDmJ0rDzfzU6WrfCpsPhWDoiiVsHy5hNM';
+    const FETCH_LINK = `https://www.googleapis.com/books/v1/volumes?q=intitle:${query}&projection=lite&key=${APIKEY}`;
 
     await fetch(FETCH_LINK, {headers: HEADERS})
       .then(response => {
@@ -48,14 +52,34 @@ export const FindBookScreen: React.FC<FindBookScreenNavigationProp> = () => {
         setResult(data.items);
         setQuery('');
         setFindBookButtonText('Find another book');
-
-        // TODO: check if gBookId matches a book _id in realm.
+        return data.items;
+      })
+      .then(books => {
+        for (const book of books) {
+          checkAgainstRealm(book);
+        }
 
         return;
       })
       .catch(error => {
+        console.error(`Failed request: ${error.message}`);
         Alert.alert(`Failed request: ${error.message}`);
       });
+  };
+
+  const checkAgainstRealm = rawBook => {
+    // Check each book that's returned to see if it's already in
+    // the realm.
+    // TODO: Consider if there's a better way to do this check.
+    const isInRealm = realm.objectForPrimaryKey(Book, rawBook.id);
+
+    // PICK UP HERE: this if check isn't working
+    if (isInRealm) {
+      rawBook.isInRealm = true;
+    } else {
+      rawBook.isInRealm = false;
+      return;
+    }
   };
 
   return (
@@ -80,15 +104,19 @@ export const FindBookScreen: React.FC<FindBookScreenNavigationProp> = () => {
         />
       </View>
 
-      {result && result.length && (
-        <FlatList
-          data={result}
-          keyExtractor={result => result.id.toString()}
-          renderItem={({item}) => {
-            return <BookOverview bookInfo={item} />;
-          }}
-        />
-      )}
+      <View>
+        {result && (
+          <FlatList
+            style={styles.searchList}
+            data={result}
+            keyExtractor={result => result.id.toString()}
+            numColumns={2}
+            renderItem={({item}) => {
+              return <BookOverview bookInfo={item} />;
+            }}
+          />
+        )}
+      </View>
 
       {/* TODO: If book is already in realm, pass the Book object. If not, pass basic info. */}
       {/* TODO: add prop for `isInRealm`. */}
@@ -108,5 +136,9 @@ const styles = StyleSheet.create({
     flex: 1,
     marginHorizontal: 14,
     marginVertical: 10,
+  },
+  searchList: {
+    // width: '100%',
+    marginVertical: 40,
   },
 });

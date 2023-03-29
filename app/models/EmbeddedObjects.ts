@@ -15,19 +15,17 @@ export class Author extends Realm.Object<Author> {
   };
 }
 
-export class Cover extends Realm.Object<Cover> {
+export class ImageLinks extends Realm.Object<ImageLinks> {
   _id: Realm.BSON.ObjectId = new Realm.BSON.ObjectId();
-  large?: string;
-  medium?: string;
-  small?: string;
+  smallThumbnail?: string;
+  thumbnail?: string;
 
   static schema = {
-    name: 'Cover',
+    name: 'ImageLinks',
     embedded: true,
     properties: {
-      large: 'string',
-      medium: 'string',
-      small: 'string',
+      smallThumbnail: 'string',
+      thumbnail: 'string',
     },
   };
 }
@@ -62,15 +60,15 @@ export class Excerpt extends Realm.Object<Excerpt> {
 
 export class Identifier extends Realm.Object<Identifier> {
   _id: Realm.BSON.ObjectId = new Realm.BSON.ObjectId();
-  identifierType!: string;
-  identifierValue!: string;
+  type!: string;
+  identifier!: string;
 
   static schema = {
     name: 'Identifier',
     embedded: true,
     properties: {
-      identifierType: 'string',
-      identifierValue: 'string',
+      type: 'string',
+      identifier: 'string',
     },
   };
 }

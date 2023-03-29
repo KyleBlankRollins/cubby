@@ -1,9 +1,18 @@
 import React from 'react';
-import {FlatList, Image, Pressable, StyleSheet, View} from 'react-native';
+import {
+  FlatList,
+  Image,
+  Pressable,
+  StyleSheet,
+  View,
+  useColorScheme,
+  useWindowDimensions,
+} from 'react-native';
 
 import {useNavigation} from '@react-navigation/native';
 
 import {HomeScreenNavigationProp} from '../navigation/types';
+import {light, dark, lightStyles, darkStyles} from '../styles/theme';
 import {AppButton} from '../baseComponents/AppButton';
 import {AppText} from '../baseComponents/AppText';
 import {AppHeaderText} from '../baseComponents/AppHeaderText';
@@ -16,38 +25,57 @@ type BookOverviewProps = {
 
 export const BookOverview: React.FC<BookOverviewProps> = ({bookInfo}) => {
   const navigation = useNavigation<HomeScreenNavigationProp>();
+  const {width} = useWindowDimensions();
+  const isDarkMode = useColorScheme() === 'dark';
+
   const book = bookInfo.volumeInfo;
+
+  const themeStyles = isDarkMode ? darkStyles : lightStyles;
+  const themeColors = isDarkMode ? dark : light;
+
+  const tileDimensions = {
+    width: width / 2 - 24,
+    minHeight: 200,
+    marginHorizontal: 5,
+    marginVertical: 10,
+  };
+
+  const border = {
+    borderStyle: 'solid',
+    borderWidth: 1,
+    borderColor: themeColors.surface4,
+  };
 
   return (
     <Pressable
-      style={styles.bookContainer}
+      style={[styles.book, themeStyles.surface2, border, tileDimensions]}
       onPress={() => {
         navigation.navigate('BookScreen', {
           book: book,
         });
       }}>
-      <View>
-        {book.imageLinks && (
-          <Image
-            style={styles.image}
-            source={{
-              uri: book.imageLinks!.thumbnail,
-            }}
-          />
-        )}
-      </View>
-      <View>
-        <AppHeaderText level={3}>{book.title}</AppHeaderText>
+      {book.imageLinks && (
+        <Image
+          style={styles.image}
+          source={{
+            uri: book.imageLinks!.thumbnail,
+          }}
+        />
+      )}
 
-        <FlatList
+      <View>
+        <AppHeaderText level={4}>{book.title}</AppHeaderText>
+
+        {/* <FlatList
           data={book.authors}
           renderItem={({item}) => <Item name={item} />}
           keyExtractor={author => author}
-        />
+        /> */}
 
-        <AppText>{book.publisher}</AppText>
+        {/* <AppText>{book.publisher}</AppText>
         <AppText>{book.publishDate}</AppText>
-        <AppText>{book.description}</AppText>
+        <AppText>{book.description}</AppText> */}
+        <AppText>Is in realm: {book.isInRealm ? 'Yes' : 'No'}</AppText>
       </View>
     </Pressable>
   );
@@ -62,16 +90,22 @@ const Item = ({name}: ItemProps) => (
 );
 
 const styles = StyleSheet.create({
-  bookContainer: {
-    flexDirection: 'row',
-    marginVertical: 40,
-    justifyContent: 'space-around',
+  book: {
+    justifyContent: 'center',
     alignItems: 'center',
+    // width: '50%',
+    // marginHorizontal: 5,
+    // marginVertical: 10,
+    paddingVertical: 15,
   },
   image: {
+    ...StyleSheet.absoluteFill,
     resizeMode: 'cover',
-    height: 200,
-    width: 125,
-    marginRight: 10,
+    opacity: 0.15,
+    // height: 250,
+    // width: 150,
+  },
+  bookContent: {
+    opacity: 1.0,
   },
 });
