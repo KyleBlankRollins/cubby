@@ -16,18 +16,18 @@ import {AppText} from '../baseComponents/AppText';
 
 import {Cubby} from '../models/Cubby';
 import {Book} from '../models/Book';
-import {bookAPIRaw} from '../models/bookAPIRaw';
+import {RawBook} from '../models/gBookApiRaw';
 import {RealmContext} from '../models';
 
 const {useQuery} = RealmContext;
 
 type AddBookFormProps = {
-  bookInfo: Book | bookAPIRaw;
+  bookInfo: Book | RawBook;
   onSubmit: (destinationCubbyId: Realm.BSON.ObjectId | undefined) => void;
   onClose: () => void;
   visible: boolean;
 };
-// PICK UP HERE: Finish add book flow
+
 export const AddBookForm: React.FC<AddBookFormProps> = ({
   onSubmit,
   onClose,

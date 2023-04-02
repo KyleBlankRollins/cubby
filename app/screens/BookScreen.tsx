@@ -1,4 +1,4 @@
-import React, {useState, useCallback} from 'react';
+import React, {useState, useCallback, useEffect} from 'react';
 import {StyleSheet, View, Image, ScrollView} from 'react-native';
 import {useRoute} from '@react-navigation/native';
 
@@ -10,12 +10,13 @@ import {AppHeaderText} from '../baseComponents/AppHeaderText';
 import {AddBookForm} from '../components/AddBookForm';
 
 import {Book} from '../models/Book';
+import {RawBook} from '../models/gBookApiRaw';
 import {Section} from '../models/Section';
 import {Cubby} from '../models/Cubby';
 import {RealmContext} from '../models';
 import {
   Author,
-  Cover,
+  ImageLinks,
   Ebook,
   Excerpt,
   Identifier,
@@ -25,22 +26,29 @@ import {
   TableOfContents,
 } from '../models/EmbeddedObjects';
 
-const {useRealm, useQuery} = RealmContext;
+const {useRealm, useObject} = RealmContext;
 
 export const BookScreen: React.FC<BookScreenNavigationProp> = () => {
   // const [isInRealm, setIsInRealm] = useState(false);
   const [bookFormVisible, setBookFormVisible] = useState(false);
   const [opacityLevel, setOpacityLevel] = useState(1);
+  const [book, setBook] = useState<Book | RawBook>();
 
   const route = useRoute<BookScreenRouteProp>();
   const {bookInfo} = route.params;
+  const realmBook = useObject(Book, bookInfo.id);
 
-  // const id = JSON.parse(props.bookId);
   const realm = useRealm();
-  const realmBook: Realm.Results<Book> = useQuery(Book).filtered(
-    `title == "${bookInfo.title}"`,
-  );
-  // const book = result.filtered(`_id == oid(${id})`)[0];
+
+  useEffect(() => {
+    if (realmBook) {
+      setBook(realmBook);
+    } else {
+      setBook(bookInfo);
+
+      return;
+    }
+  }, [realm, realmBook, bookInfo, setBook]);
 
   // TODO: Check if book is already in the realm, which means it's in a cubby. Show that info.
 
@@ -62,230 +70,128 @@ export const BookScreen: React.FC<BookScreenNavigationProp> = () => {
         return;
       }
 
-      const constructedBook = {
-        authors: [],
-        cover: {},
-        ebooks: [],
-        // TODO: finish creating embedded objects (just TOC left)
-        // think about how to streamline this.
-        // after constructedBook is complete, can pass to
-        // `realm.create('Book')`.
-        excerpts: [],
-        identifiers: [],
-        key: bookInfo.key,
-        links: [],
-        numberOfPages: bookInfo.number_of_pages,
-        notes: bookInfo.notes,
-        publishDate: bookInfo.publishDate,
-        publishers: [],
-        subjects: [],
-        subtitle: bookInfo.subtitle,
-        tableOfContents: [],
-        title: bookInfo.title,
-        url: bookInfo.url,
-      };
-
-      // iterate authors and create new Author Realm objects
-      for (let index = 0; index < bookInfo.authors.length; index++) {
-        const newAuthor: Author = realm.create('Author', {
-          name: bookInfo.authors[index].name,
-          url: bookInfo.authors[index].url,
-        });
-
-        constructedBook.authors.push(newAuthor);
-      }
-
-      // if cover object exists, create new Cover Realm object
-      if (bookInfo.cover) {
-        const newCover: Cover = realm.create('Cover', {
-          large: bookInfo.cover.large,
-          medium: bookInfo.cover.medium,
-          small: bookInfo.cover.small,
-        });
-
-        constructedBook.cover = newCover;
-      }
-
-      // iterate ebooks and create new Ebook Realm objects
-      if (bookInfo.ebooks && bookInfo.ebooks.length) {
-        for (let index = 0; index < bookInfo.ebooks.length; index++) {
-          const newEbook: Ebook = realm.create('Ebook', {
-            previewUrl: bookInfo.ebooks[index].preview_url,
-          });
-
-          constructedBook.ebooks.push(newEbook);
-        }
-      }
-
-      // iterate excerpts and create new Excerpt Realm objects
-      if (bookInfo.excerpts && bookInfo.excerpts.length) {
-        for (let index = 0; index < bookInfo.excerpts.length; index++) {
-          const newExcerpt: Excerpt = realm.create('Excerpt', {
-            comment: bookInfo.excerpts[index].comment,
-            text: bookInfo.excerpts[index].text,
-          });
-
-          constructedBook.excerpts.push(newExcerpt);
-        }
-      }
+      let identifiers = [];
+      let cover: ImageLinks;
 
       // iterate identifiers and create new Identifier Realm objects
-      if (bookInfo.identifiers) {
-        for (
-          let index = 0;
-          index < Object.keys(bookInfo.identifiers).length;
-          index++
-        ) {
+      if (book.identifiers) {
+        for (const identifier of book.identifiers) {
           const newIdentifier: Identifier = realm.create('Identifier', {
-            identifierType: Object.keys(bookInfo.identifiers)[index],
-            identifierValue: Object.keys(bookInfo.identifiers)[index][0],
+            type: identifier.type,
+            identifier: identifier.identifier,
           });
 
-          constructedBook.identifiers.push(newIdentifier);
+          identifiers.push(newIdentifier);
         }
       }
 
-      // iterate links and create new Link Realm objects
-      if (bookInfo.links && bookInfo.links.length) {
-        for (let index = 0; index < bookInfo.links.length; index++) {
-          const newLink: Link = realm.create('Link', {
-            url: bookInfo.links[index].url,
-            title: bookInfo.links[index].title,
-          });
+      // create new ImageLinks Realm object for cover object
+      if (book.imageLinks) {
+        const newCover: ImageLinks = realm.create('ImageLinks', {
+          smallThumbnail: book.imageLinks.smallThumbnail,
+          thumbnail: book.imageLinks.thumbnail,
+        });
 
-          constructedBook.links.push(newLink);
-        }
+        cover = newCover;
       }
-
-      // iterate publishers and create new Publisher Realm objects
-      if (bookInfo.publishers && bookInfo.publishers.length) {
-        for (let index = 0; index < bookInfo.publishers.length; index++) {
-          const newPublisher: Publisher = realm.create('Publisher', {
-            name: bookInfo.publishers[index].name,
-          });
-
-          constructedBook.publishers.push(newPublisher);
-        }
-      }
-
-      // iterate subjects and create new Subject Realm objects
-      if (bookInfo.subjects && bookInfo.subjects.length) {
-        for (let index = 0; index < bookInfo.subjects.length; index++) {
-          const newSubject: Subject = realm.create('Subject', {
-            name: bookInfo.subjects[index].name,
-            url: bookInfo.subjects[index].url,
-          });
-
-          constructedBook.subjects.push(newSubject);
-        }
-      }
-
-      // iterate tableOfContents and create new TableOfContents Realm objects
-      // if (bookInfo.tableOfContents && bookInfo.tableOfContents.length) {
-      //   for (let index = 0; index < bookInfo.tableOfContents.length; index++) {
-      //     const newTableOfContents: TableOfContents = realm.create(
-      //       'TableOfContents',
-      //       {
-      //         level: bookInfo.tableOfContents[index].level,
-      //         title: bookInfo.tableOfContents[index].title,
-      //         pagenumb: bookInfo.tableOfContents[index].pagenumb,
-      //       },
-      //     );
-
-      //     constructedBook.tableOfContents.push(newTableOfContents);
-      //   }
-      // }
 
       const destinationCubby: Cubby | null = realm.objectForPrimaryKey(
         'Cubby',
         destinationCubbyId,
       );
 
-      // realm.write(() => {
-      //   const newBook: Book = realm.create(
-      //     'Book',
-      //     Book.generate({
-      // authors: bookInfo.authors,
-      // cover: bookInfo.cover,
-      // ebooks: bookInfo.ebooks,
-      // excerpts: bookInfo.excerpts,
-      // identifiers: bookInfo.identifiers,
-      // key: bookInfo.key,
-      // links: bookInfo.links,
-      // numberOfPages: bookInfo.number_of_pages,
-      // notes: bookInfo.notes,
-      // publishDate: bookInfo.publishDate,
-      // publishers: bookInfo.publishers,
-      // subjects: bookInfo.subjects,
-      // subtitle: bookInfo.subtitle,
-      // tableOfContents: bookInfo.table_of_contents,
-      // title: bookInfo.title,
-      // url: bookInfo.url,
-      //     }),
-      //   );
+      realm.write(() => {
+        const newBook: Book = realm.create('Book', {
+          _id: book.id,
+          authors: book.authors,
+          imageLinks: cover,
+          description: book.description ? book.description : '',
+          industryIdentifiers: book.industryIdentifiers,
+          infoLink: book.infoLink,
+          subtitle: book.subtitle,
+          numberOfPages: book.number_of_pages,
+          notes: book.notes,
+          publishDate: book.publishDate,
+          publisher: book.publisher,
+          subjects: book.subjects,
+          subtitle: book.subtitle,
+          tableOfContents: book.table_of_contents,
+          title: book.title,
+          url: book.url,
+        });
 
-      //   // Assuming all cubbies have 1 section.
-      //   destinationCubby?.sections[0].books.push(newBook);
+        // Assuming all cubbies have 1 section.
+        destinationCubby?.sections[0].books.push(newBook);
 
-      //   handleModalClose();
+        handleModalClose();
 
-      //   return newCubby;
-      // });
+        return newCubby;
+      });
     },
-    [realm],
+    [realm, book],
   );
 
-  return (
-    <ScrollView style={[styles.container, handleModalOpacity()]}>
-      <AppHeaderText level={2}>{bookInfo.title}</AppHeaderText>
-      {/* TODO: add description when available */}
-      <AppText>If book description, put it here.</AppText>
+  if (!book) {
+    return (
+      <View>
+        <AppText>Not ready to render.</AppText>
+      </View>
+    );
+  } else {
+    return (
+      <ScrollView style={[styles.container, handleModalOpacity()]}>
+        <AppHeaderText level={2}>{book.title}</AppHeaderText>
+        <AppHeaderText level={4}>by {book.authors}</AppHeaderText>
 
-      <AppText>{JSON.stringify(bookInfo, null, 2)}</AppText>
+        {/* TODO: Figure out how to programmatically chunk descriptions into paragraphs. */}
+        <AppText>{book.description}</AppText>
 
-      {/* TODO: Add placeholder for books with no cover */}
-      {bookInfo.cover && bookInfo.cover.medium && (
-        <Image
-          style={styles.image}
-          source={{
-            uri: bookInfo.cover.medium,
+        <AppText>{JSON.stringify(book, null, 2)}</AppText>
+
+        {/* TODO: Add placeholder for books with no cover */}
+        {book.imageLinks && (
+          <Image
+            style={styles.image}
+            source={{
+              uri: book.imageLinks!.thumbnail,
+            }}
+          />
+        )}
+
+        <AppButton
+          onPress={() => {
+            setBookFormVisible(true);
+            setOpacityLevel(0.25);
+          }}
+          title="Add to Cubby"
+          options={{
+            customStyle: styles.customButtonStyle,
+            fullWidth: false,
+            largeText: true,
           }}
         />
-      )}
 
-      <AppButton
-        onPress={() => {
-          setBookFormVisible(true);
-          setOpacityLevel(0.25);
-        }}
-        title="Add to Cubby"
-        options={{
-          customStyle: styles.customButtonStyle,
-          fullWidth: false,
-          largeText: true,
-        }}
-      />
+        {/* TODO: Only show if it's in a cubby. */}
+        {/* TODO: Make it delete the cubby book. */}
+        <AppButton
+          title="Delete book"
+          onPress={() => {
+            //TODO: add confirmation
+            realm.write(() => {
+              realm.delete();
+            });
+          }}
+        />
 
-      {/* TODO: Only show if it's in a cubby. */}
-      {/* TODO: Make it delete the cubby book. */}
-      <AppButton
-        title="Delete book"
-        onPress={() => {
-          //TODO: add confirmation
-          realm.write(() => {
-            realm.delete();
-          });
-        }}
-      />
-
-      <AddBookForm
-        bookInfo={bookInfo}
-        onSubmit={handleAddBook}
-        onClose={handleModalClose}
-        visible={bookFormVisible}
-      />
-    </ScrollView>
-  );
+        <AddBookForm
+          bookInfo={book}
+          onSubmit={handleAddBook}
+          onClose={handleModalClose}
+          visible={bookFormVisible}
+        />
+      </ScrollView>
+    );
+  }
 };
 
 const styles = StyleSheet.create({

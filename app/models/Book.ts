@@ -8,6 +8,7 @@ export class Book extends Realm.Object<Book> {
   publisher!: string;
   description!: string;
   infoLink!: string;
+  subtitle?: string;
   industryIdentifiers?: Realm.List<Identifier>;
   pageCount?: number;
   printType?: string;
@@ -17,7 +18,7 @@ export class Book extends Realm.Object<Book> {
   maturityRating?: string;
   language?: string;
   publishedDate?: string;
-  cover?: ImageLinks;
+  imageLinks?: ImageLinks;
   userId?: Realm.BSON.ObjectId;
 
   static schema = {
@@ -25,6 +26,7 @@ export class Book extends Realm.Object<Book> {
     properties: {
       _id: 'string',
       title: 'string',
+      subtitle: 'string',
       authors: 'string[]',
       publisher: 'string',
       description: 'string',
@@ -41,7 +43,7 @@ export class Book extends Realm.Object<Book> {
       maturityRating: 'string?',
       language: 'string?',
       publishedDate: 'string?',
-      cover: 'ImageLinks?',
+      imageLinks: 'ImageLinks?',
       userId: 'string?',
       assignee: {
         type: 'linkingObjects',

@@ -14,7 +14,7 @@ type CubbyOverviewProps = {
   cubby: Cubby & Realm.Object;
   onDelete: () => void;
 };
-// Pick up here. Need to add delete and maybe edit buttons.
+
 export const CubbyOverview = React.memo<CubbyOverviewProps>(
   ({cubby, onDelete}) => {
     const navigation = useNavigation<HomeScreenNavigationProp>();

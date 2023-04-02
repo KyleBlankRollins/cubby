@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
   FlatList,
   Image,
@@ -17,6 +17,10 @@ import {AppButton} from '../baseComponents/AppButton';
 import {AppText} from '../baseComponents/AppText';
 import {AppHeaderText} from '../baseComponents/AppHeaderText';
 import {bookAPIRaw} from '../models/bookAPIRaw';
+import {Book} from '../models/Book';
+import {RealmContext} from '../models';
+
+const {useObject} = RealmContext;
 
 type BookOverviewProps = {
   // TODO: Update this when I have more info.
@@ -28,7 +32,8 @@ export const BookOverview: React.FC<BookOverviewProps> = ({bookInfo}) => {
   const {width} = useWindowDimensions();
   const isDarkMode = useColorScheme() === 'dark';
 
-  const book = bookInfo.volumeInfo;
+  const rawBook = bookInfo.volumeInfo;
+  const realmBook = useObject(Book, bookInfo.id);
 
   const themeStyles = isDarkMode ? darkStyles : lightStyles;
   const themeColors = isDarkMode ? dark : light;
@@ -51,31 +56,32 @@ export const BookOverview: React.FC<BookOverviewProps> = ({bookInfo}) => {
       style={[styles.book, themeStyles.surface2, border, tileDimensions]}
       onPress={() => {
         navigation.navigate('BookScreen', {
-          book: book,
+          // If the book is in the realm, pass the realm object.
+          bookInfo: realmBook ? realmBook : {id: bookInfo.id, ...rawBook},
         });
       }}>
-      {book.imageLinks && (
+      {rawBook.imageLinks && (
         <Image
           style={styles.image}
           source={{
-            uri: book.imageLinks!.thumbnail,
+            uri: rawBook.imageLinks!.thumbnail,
           }}
         />
       )}
 
       <View>
-        <AppHeaderText level={4}>{book.title}</AppHeaderText>
+        <AppHeaderText level={4}>{rawBook.title}</AppHeaderText>
 
         {/* <FlatList
-          data={book.authors}
+          data={rawBook.authors}
           renderItem={({item}) => <Item name={item} />}
           keyExtractor={author => author}
         /> */}
 
-        {/* <AppText>{book.publisher}</AppText>
-        <AppText>{book.publishDate}</AppText>
-        <AppText>{book.description}</AppText> */}
-        <AppText>Is in realm: {book.isInRealm ? 'Yes' : 'No'}</AppText>
+        {/* <AppText>{rawBook.publisher}</AppText>
+        <AppText>{rawBook.publishDate}</AppText>
+        <AppText>{rawBook.description}</AppText> */}
+        <AppText>Is in realm: {realmBook ? 'Yes' : 'No'}</AppText>
       </View>
     </Pressable>
   );

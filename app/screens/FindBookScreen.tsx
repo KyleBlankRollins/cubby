@@ -12,6 +12,7 @@ import {AppButton} from '../baseComponents/AppButton';
 import {AppText} from '../baseComponents/AppText';
 import {FindBookScreenNavigationProp} from '../navigation/types';
 import {BookOverview} from '../components/BookOverview';
+import {GBOOKS_API_KEY, DEVICE_SHA} from '@env';
 
 import {Cubby} from '../models/Cubby';
 import {Section} from '../models/Section';
@@ -27,18 +28,22 @@ export const FindBookScreen: React.FC<FindBookScreenNavigationProp> = () => {
   const [query, setQuery] = useState('');
   const [result, setResult] = useState();
   const [findBookButtonText, setFindBookButtonText] = useState('Find book');
+  const [resultMessage, setResultMessage] = useState('Search results here...');
 
   // TODO: rewrite as serverless function
+  // TODO: Add options for search: author (inauthor), subject (subject), isbn (isbn)
+  // TODO: Use Partial Response to get only the fields I want.
+  // https://developers.google.com/books/docs/v1/performance#partial-response
   const requestBookByTitle = async () => {
-    const SHA1 = '5E8F16062EA3CD2C4A0D547876BAA6F38CABF625';
+    const SHA1 = DEVICE_SHA;
     const PACKAGE_NAME = 'com.cubby';
     const HEADERS = {
       'Content-Type': 'application/json',
       'X-Android-Package': PACKAGE_NAME,
       'X-Android-Cert': SHA1,
     };
-    const APIKEY = 'AIzaSyBDmJ0rDzfzU6WrfCpsPhWDoiiVsHy5hNM';
-    const FETCH_LINK = `https://www.googleapis.com/books/v1/volumes?q=intitle:${query}&projection=lite&key=${APIKEY}`;
+    const APIKEY = GBOOKS_API_KEY;
+    const FETCH_LINK = `https://www.googleapis.com/books/v1/volumes?q=intitle:${query}&printType=books&key=${APIKEY}`;
 
     await fetch(FETCH_LINK, {headers: HEADERS})
       .then(response => {
@@ -49,37 +54,25 @@ export const FindBookScreen: React.FC<FindBookScreenNavigationProp> = () => {
         return response.json();
       })
       .then(data => {
-        setResult(data.items);
-        setQuery('');
-        setFindBookButtonText('Find another book');
-        return data.items;
-      })
-      .then(books => {
-        for (const book of books) {
-          checkAgainstRealm(book);
-        }
+        if (data.items && data.items.length) {
+          setResult(data.items);
+          setQuery('');
+          setFindBookButtonText('Find another book');
+          setResultMessage("Here's what we found!");
 
-        return;
+          return data.items;
+        } else {
+          setResultMessage(
+            `Hmm... Couldn't find any books with titles that contain "${query}".`,
+          );
+
+          return;
+        }
       })
       .catch(error => {
         console.error(`Failed request: ${error.message}`);
         Alert.alert(`Failed request: ${error.message}`);
       });
-  };
-
-  const checkAgainstRealm = rawBook => {
-    // Check each book that's returned to see if it's already in
-    // the realm.
-    // TODO: Consider if there's a better way to do this check.
-    const isInRealm = realm.objectForPrimaryKey(Book, rawBook.id);
-
-    // PICK UP HERE: this if check isn't working
-    if (isInRealm) {
-      rawBook.isInRealm = true;
-    } else {
-      rawBook.isInRealm = false;
-      return;
-    }
   };
 
   return (
@@ -105,6 +98,7 @@ export const FindBookScreen: React.FC<FindBookScreenNavigationProp> = () => {
       </View>
 
       <View>
+        <AppText>{resultMessage}</AppText>
         {result && (
           <FlatList
             style={styles.searchList}

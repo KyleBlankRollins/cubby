@@ -2,7 +2,7 @@ import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import type {RouteProp} from '@react-navigation/native';
 import {Cubby} from '../models/Cubby';
 import {Book} from '../models/Book';
-import {bookAPIRaw} from '../models/bookAPIRaw';
+import {RawBook} from '../models/gBookApiRaw';
 
 export type HomeStackNavigatorParamList = {
   CubbyManager: {
@@ -13,7 +13,7 @@ export type HomeStackNavigatorParamList = {
     name: string;
   };
   BookScreen: {
-    bookInfo: any;
+    bookInfo: Book | RawBook;
   };
   AddCubbyModal: {};
   AddBookModal: {};
