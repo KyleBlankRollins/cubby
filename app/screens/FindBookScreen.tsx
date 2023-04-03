@@ -1,4 +1,4 @@
-import React, {useState, useCallback} from 'react';
+import React, {useState} from 'react';
 import {
   Alert,
   FlatList,
@@ -14,17 +14,7 @@ import {FindBookScreenNavigationProp} from '../navigation/types';
 import {BookOverview} from '../components/BookOverview';
 import {GBOOKS_API_KEY, DEVICE_SHA} from '@env';
 
-import {Cubby} from '../models/Cubby';
-import {Section} from '../models/Section';
-import {RealmContext} from '../models';
-import {RawBook} from '../models/gBookApiRaw';
-import {Book} from '../models/Book';
-
-const {useRealm} = RealmContext;
-
 export const FindBookScreen: React.FC<FindBookScreenNavigationProp> = () => {
-  const realm = useRealm();
-  const [gBookId, setgBookId] = useState('');
   const [query, setQuery] = useState('');
   const [result, setResult] = useState();
   const [findBookButtonText, setFindBookButtonText] = useState('Find book');

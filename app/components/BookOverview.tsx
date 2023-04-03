@@ -13,11 +13,12 @@ import {useNavigation} from '@react-navigation/native';
 
 import {HomeScreenNavigationProp} from '../navigation/types';
 import {light, dark, lightStyles, darkStyles} from '../styles/theme';
-import {AppButton} from '../baseComponents/AppButton';
+
 import {AppText} from '../baseComponents/AppText';
 import {AppHeaderText} from '../baseComponents/AppHeaderText';
-import {bookAPIRaw} from '../models/bookAPIRaw';
 import {Book} from '../models/Book';
+
+import {BookMap} from '../models/gBookApiRaw';
 import {RealmContext} from '../models';
 
 const {useObject} = RealmContext;
@@ -31,8 +32,25 @@ export const BookOverview: React.FC<BookOverviewProps> = ({bookInfo}) => {
   const navigation = useNavigation<HomeScreenNavigationProp>();
   const {width} = useWindowDimensions();
   const isDarkMode = useColorScheme() === 'dark';
-
-  const rawBook = bookInfo.volumeInfo;
+  const rawBook: BookMap = {
+    _id: bookInfo.id,
+    title: bookInfo.volumeInfo.title,
+    authors: bookInfo.volumeInfo.authors,
+    publisher: bookInfo.volumeInfo.publisher,
+    description: bookInfo.volumeInfo.description,
+    infoLink: bookInfo.volumeInfo.infoLink,
+    subtitle: bookInfo.volumeInfo.subtitle,
+    industryIdentifiers: bookInfo.volumeInfo.industryIdentifiers,
+    pageCount: bookInfo.volumeInfo.pageCount,
+    printType: bookInfo.volumeInfo.printType,
+    categories: bookInfo.volumeInfo.categories,
+    averageRating: bookInfo.volumeInfo.averageRating,
+    ratingsCount: bookInfo.volumeInfo.ratingsCount,
+    maturityRating: bookInfo.volumeInfo.maturityRating,
+    language: bookInfo.volumeInfo.language,
+    publishedDate: bookInfo.volumeInfo.publishedDate,
+    imageLinks: bookInfo.volumeInfo.imageLinks,
+  };
   const realmBook = useObject(Book, bookInfo.id);
 
   const themeStyles = isDarkMode ? darkStyles : lightStyles;
@@ -57,7 +75,9 @@ export const BookOverview: React.FC<BookOverviewProps> = ({bookInfo}) => {
       onPress={() => {
         navigation.navigate('BookScreen', {
           // If the book is in the realm, pass the realm object.
-          bookInfo: realmBook ? realmBook : {id: bookInfo.id, ...rawBook},
+          bookInfo: realmBook
+            ? {_id: bookInfo.id, isInRealm: true}
+            : {_id: bookInfo.id, isInRealm: false, rawBook},
         });
       }}>
       {rawBook.imageLinks && (
@@ -72,15 +92,12 @@ export const BookOverview: React.FC<BookOverviewProps> = ({bookInfo}) => {
       <View>
         <AppHeaderText level={4}>{rawBook.title}</AppHeaderText>
 
-        {/* <FlatList
+        <FlatList
           data={rawBook.authors}
           renderItem={({item}) => <Item name={item} />}
           keyExtractor={author => author}
-        /> */}
+        />
 
-        {/* <AppText>{rawBook.publisher}</AppText>
-        <AppText>{rawBook.publishDate}</AppText>
-        <AppText>{rawBook.description}</AppText> */}
         <AppText>Is in realm: {realmBook ? 'Yes' : 'No'}</AppText>
       </View>
     </Pressable>
@@ -105,6 +122,7 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
   },
   image: {
+    // @ts-ignore
     ...StyleSheet.absoluteFill,
     resizeMode: 'cover',
     opacity: 0.15,

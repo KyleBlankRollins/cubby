@@ -16,14 +16,14 @@ import {AppText} from '../baseComponents/AppText';
 
 import {Cubby} from '../models/Cubby';
 import {Book} from '../models/Book';
-import {RawBook} from '../models/gBookApiRaw';
+import {BookMap} from '../models/gBookApiRaw';
 import {RealmContext} from '../models';
 
 const {useQuery} = RealmContext;
 
 type AddBookFormProps = {
-  bookInfo: Book | RawBook;
-  onSubmit: (destinationCubbyId: Realm.BSON.ObjectId | undefined) => void;
+  bookInfo: Book | BookMap;
+  onSubmit: (destinationCubbyId: Realm.BSON.ObjectId) => void;
   onClose: () => void;
   visible: boolean;
 };
@@ -37,8 +37,9 @@ export const AddBookForm: React.FC<AddBookFormProps> = ({
   // TODO: Change this to add dropdown or tap selection for destination cubby.
   // Ignore sections for now. Put all books in the default section.
   const [destinationCubby, setDestinationCubby] = useState('No Cubby selected');
-  const [destinationCubbyId, setDestinationCubbyId] =
-    useState<Realm.BSON.ObjectId>();
+  const [destinationCubbyId, setDestinationCubbyId] = useState<
+    Realm.BSON.ObjectId | undefined
+  >();
 
   const isDarkMode = useColorScheme() === 'dark';
   const themeStyles = isDarkMode ? darkStyles : lightStyles;

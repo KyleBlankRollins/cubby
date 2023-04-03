@@ -1,8 +1,7 @@
 import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import type {RouteProp} from '@react-navigation/native';
 import {Cubby} from '../models/Cubby';
-import {Book} from '../models/Book';
-import {RawBook} from '../models/gBookApiRaw';
+import {BookMap} from '../models/gBookApiRaw';
 
 export type HomeStackNavigatorParamList = {
   CubbyManager: {
@@ -13,7 +12,11 @@ export type HomeStackNavigatorParamList = {
     name: string;
   };
   BookScreen: {
-    bookInfo: Book | RawBook;
+    bookInfo: {
+      _id: string;
+      isInRealm: boolean;
+      rawBook?: BookMap;
+    };
   };
   AddCubbyModal: {};
   AddBookModal: {};
