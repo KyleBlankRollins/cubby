@@ -1,76 +1,56 @@
 import React from 'react';
 import Realm from 'realm';
-import {View, Pressable, Alert, StyleSheet} from 'react-native';
+import {View, Pressable, StyleSheet} from 'react-native';
 
 import {useNavigation} from '@react-navigation/native';
 import {HomeScreenNavigationProp} from '../navigation/types';
 
 import {Cubby} from '../models/Cubby';
-import {AppButton} from '../baseComponents/AppButton';
 import {AppText} from '../baseComponents/AppText';
 import {AppHeaderText} from '../baseComponents/AppHeaderText';
 
 type CubbyOverviewProps = {
   cubby: Cubby & Realm.Object;
-  onDelete: () => void;
 };
 
-export const CubbyOverview = React.memo<CubbyOverviewProps>(
-  ({cubby, onDelete}) => {
-    const navigation = useNavigation<HomeScreenNavigationProp>();
+export const CubbyOverview = React.memo<CubbyOverviewProps>(({cubby}) => {
+  const navigation = useNavigation<HomeScreenNavigationProp>();
 
-    let numberOfBooks: number = 0;
+  let numberOfBooks: number = 0;
 
-    for (let index = 0; index < cubby.sections.length; index++) {
-      const section = cubby.sections[index];
+  for (let index = 0; index < cubby.sections.length; index++) {
+    const section = cubby.sections[index];
 
-      numberOfBooks = numberOfBooks + section.books.length;
-    }
+    numberOfBooks = numberOfBooks + section.books.length;
+  }
 
-    const createAlert = () =>
-      Alert.alert(
-        `${cubby.name}?`,
-        'Are you sure you want to delete this Cubby?',
-        [
-          {
-            text: 'Cancel',
-            onPress: () => console.log('Cancel Pressed'),
-            style: 'cancel',
-          },
-          {text: 'Yes', onPress: () => onDelete()},
-        ],
-      );
-
-    return (
-      <Pressable
-        style={styles.cubby}
-        onPress={() =>
-          navigation.navigate('CubbyScreen', {
-            name: cubby.name,
-            _id: cubby._id.toString(),
-          })
-        }>
-        <View style={styles.overviewContainer}>
-          <View style={styles.nameContainer}>
-            <AppHeaderText numberOfLines={1} level={2}>
-              {cubby.name}
-            </AppHeaderText>
-          </View>
-          <View style={styles.descriptionContainer}>
-            <AppText numberOfLines={1}>{cubby.description}</AppText>
-          </View>
+  return (
+    <Pressable
+      style={styles.cubby}
+      onPress={() =>
+        navigation.navigate('CubbyScreen', {
+          name: cubby.name,
+          _id: cubby._id.toString(),
+        })
+      }>
+      <View style={styles.overviewContainer}>
+        <View style={styles.nameContainer}>
+          <AppHeaderText numberOfLines={1} level={2}>
+            {cubby.name}
+          </AppHeaderText>
         </View>
-        <View style={styles.infoContainer}>
-          <View style={styles.books}>
-            <AppText> {numberOfBooks} books </AppText>
-          </View>
-          {/* TODO: Add warning color. */}
-          <AppButton title={'Delete'} onPress={createAlert} />
+        <View style={styles.descriptionContainer}>
+          <AppText numberOfLines={1}>{cubby.description}</AppText>
         </View>
-      </Pressable>
-    );
-  },
-);
+      </View>
+      <View style={styles.infoContainer}>
+        <View style={styles.books}>
+          <AppText> {numberOfBooks} books </AppText>
+        </View>
+      </View>
+    </Pressable>
+  );
+});
 
 const styles = StyleSheet.create({
   cubby: {

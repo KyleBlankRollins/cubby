@@ -32,13 +32,11 @@ export const CubbyManager: React.FC<HomeScreenNavigationProp> = () => {
       }
 
       realm.write(() => {
-        const defaultSection: Section = realm.create(
-          'Section',
-          Section.generate('default section', {
-            main: '#DDD382',
-            highlight: '#D65F28',
-          }),
-        );
+        const defaultSection: Section = realm.create('Section', {
+          _id: new Realm.BSON.ObjectID(),
+          name: 'default section',
+          colors: {},
+        });
 
         const newCubby: Cubby = realm.create(
           'Cubby',
@@ -50,15 +48,6 @@ export const CubbyManager: React.FC<HomeScreenNavigationProp> = () => {
         handleModalClose();
 
         return newCubby;
-      });
-    },
-    [realm],
-  );
-
-  const handleDeleteCubby = useCallback(
-    (cubby: Cubby & Realm.Object): void => {
-      realm.write(() => {
-        realm.delete(cubby);
       });
     },
     [realm],
@@ -80,7 +69,7 @@ export const CubbyManager: React.FC<HomeScreenNavigationProp> = () => {
       {!cubbies || !cubbies.length ? (
         <IntroText />
       ) : (
-        <CubbyList cubbies={cubbies} onDeleteCubby={handleDeleteCubby} />
+        <CubbyList cubbies={cubbies} />
       )}
 
       <AppButton

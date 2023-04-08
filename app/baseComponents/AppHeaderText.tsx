@@ -26,8 +26,8 @@ export const AppHeaderText: React.FC<AppTextProps> = props => {
   return (
     <Text
       style={[
-        props.customStyle,
         styles[headingLevel[props.level] as keyof HeadingTypes],
+        props.customStyle,
       ]}
       numberOfLines={props.numberOfLines}>
       {props.children}

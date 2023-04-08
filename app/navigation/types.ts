@@ -4,9 +4,7 @@ import {Cubby} from '../models/Cubby';
 import {BookMap} from '../models/gBookApiRaw';
 
 export type HomeStackNavigatorParamList = {
-  CubbyManager: {
-    cubbies: Realm.Results<Cubby & Realm.Object>;
-  };
+  CubbyManager: {};
   CubbyScreen: {
     _id: string;
     name: string;
