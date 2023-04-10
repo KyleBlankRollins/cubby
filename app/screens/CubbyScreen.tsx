@@ -17,60 +17,6 @@ import {RealmContext} from '../models';
 
 const {useRealm, useObject, useQuery} = RealmContext;
 
-// class Shelf {
-//   _id!: Realm.BSON.ObjectId;
-//   books!: Book[];
-//   shelfWidth!: number;
-//   order!: number;
-//   _availableSpace!: number;
-
-//   constructor(shelfWidth: number, order: number) {
-//     this._id = new Realm.BSON.ObjectID();
-//     this.books = [];
-//     this.shelfWidth = shelfWidth;
-//     this._availableSpace = shelfWidth;
-//     this.order = order;
-//   }
-
-//   get getAvailableSpace() {
-//     return this._availableSpace;
-//   }
-
-//   get getBooks() {
-//     return this.books;
-//   }
-
-//   setAvailableSpace() {
-//     let spaceTaken = 0;
-
-//     if (!this.books.length) {
-//       return spaceTaken;
-//     }
-
-//     for (let index = 0; index < this.books.length; index++) {
-//       const book = this.books[index];
-//       const bookThickness = book.pageCount
-//         ? Math.round(book.pageCount * 0.08)
-//         : 10;
-//       const bookWidth = Math.round((bookThickness / this.shelfWidth) * 100);
-
-//       // PICK UP HERE: Need to reconcile this with actual book item width. Ideally, I can pass this on and not need to recalculate.
-//       // Look at calculateBookThickness() in `BookSlot`.
-//       const bookDisplayWidth = bookWidth * 10;
-
-//       spaceTaken = spaceTaken + bookDisplayWidth;
-//     }
-
-//     this._availableSpace = this.shelfWidth - spaceTaken;
-//   }
-
-//   addBook(book: Book) {
-//     this.books.push(book);
-
-//     this.setAvailableSpace();
-//   }
-// }
-
 const CubbyScreen: React.FC<CubbyScreenNavigationProp> = () => {
   const realm = useRealm();
   const route = useRoute<CubbyScreenRouteProp>();
