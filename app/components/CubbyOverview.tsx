@@ -18,10 +18,10 @@ export const CubbyOverview = React.memo<CubbyOverviewProps>(({cubby}) => {
 
   let numberOfBooks: number = 0;
 
-  for (let index = 0; index < cubby.sections.length; index++) {
-    const section = cubby.sections[index];
+  for (let index = 0; index < cubby.shelves.length; index++) {
+    const shelf = cubby.shelves[index];
 
-    numberOfBooks = numberOfBooks + section.books.length;
+    numberOfBooks = numberOfBooks + shelf.books.length;
   }
 
   return (

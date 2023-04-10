@@ -1,5 +1,11 @@
 import React, {useState, useCallback, useEffect} from 'react';
-import {StyleSheet, View, Image, ScrollView} from 'react-native';
+import {
+  StyleSheet,
+  View,
+  Image,
+  ScrollView,
+  useWindowDimensions,
+} from 'react-native';
 import {useRoute, useNavigation} from '@react-navigation/native';
 
 import {BookScreenNavigationProp} from '../navigation/types';
@@ -13,12 +19,14 @@ import {AddBookForm} from '../components/AddBookForm';
 import {Book} from '../models/Book';
 import {BookMap} from '../models/gBookApiRaw';
 import {Cubby} from '../models/Cubby';
+import {Shelf} from '../models/Shelf';
 import {RealmContext} from '../models';
 
 const {useRealm} = RealmContext;
 
 export const BookScreen: React.FC<BookScreenNavigationProp> = () => {
   const navigation = useNavigation<HomeScreenNavigationProp>();
+  const {width} = useWindowDimensions();
   const [bookFormVisible, setBookFormVisible] = useState(false);
   const [opacityLevel, setOpacityLevel] = useState(1);
   const [book, setBook] = useState<Book | BookMap>();
@@ -61,21 +69,46 @@ export const BookScreen: React.FC<BookScreenNavigationProp> = () => {
         return;
       }
 
+      // Cubby where the book should go.
       const destinationCubby: Cubby | null = realm.objectForPrimaryKey(
         'Cubby',
         destinationCubbyId,
       );
 
+      // The last shelf in the cubby.
+      const destinationShelf = destinationCubby!.shelves.sorted(
+        'order',
+        true,
+      )[0];
+
       realm.write(() => {
         // Create new book
         // @ts-ignore. TypeScript isn't happy about BookMap not having all of a Realm Object's properties.
-        const newBook: Book = realm.create('Book', {
+        const newBook: Book = realm.create(Book, {
           _id: bookInfo._id,
+          displayWidth: bookInfo.rawBook?.pageCount
+            ? calculateBookThickness(bookInfo.rawBook.pageCount!, width)
+            : 20,
+          displayHeight: bookInfo.rawBook!.title.length,
           ...bookInfo.rawBook,
         });
 
-        // Assuming all cubbies have exactly 1 section.
-        destinationCubby?.sections[0].books.push(newBook);
+        if (newBook.displayWidth < destinationShelf._availableSpace) {
+          destinationShelf.addBook(realm, newBook, true);
+        } else {
+          // Create new shelf
+          const newShelf = realm.create(Shelf, {
+            _id: new Realm.BSON.ObjectID(),
+            _availableSpace: width,
+            name: `Shelf ${destinationShelf.order + 1}`,
+            books: [],
+            shelfWidth: width,
+            order: destinationShelf.order + 1,
+          });
+
+          newShelf.addBook(realm, newBook, true);
+          destinationCubby!.addShelf(realm, newShelf, true);
+        }
 
         handleModalClose();
 
@@ -86,7 +119,7 @@ export const BookScreen: React.FC<BookScreenNavigationProp> = () => {
         // TODO: handle successful addition. Inform user book has been added - maybe prompt to go to cubby.
       });
     },
-    [realm, bookInfo],
+    [realm, bookInfo, width],
   );
 
   if (!book) {
@@ -159,6 +192,15 @@ export const BookScreen: React.FC<BookScreenNavigationProp> = () => {
     );
   }
 };
+
+function calculateBookThickness(pageCount: number, shelfWidth: number): number {
+  // Average page thickness: 0.08mm. This is a rough estimate based on https://measuringstuff.com/how-thick-is-a-piece-of-paper/.
+  // Add 4mm to average book cover thickness. Obviously, paperback and hardback would be very different.
+  const bookThickness = Math.round(pageCount * 0.08);
+  const bookWidth = Math.round((bookThickness / shelfWidth) * 100) * 10;
+
+  return bookWidth;
+}
 
 const styles = StyleSheet.create({
   container: {

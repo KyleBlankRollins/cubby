@@ -1,11 +1,11 @@
 import {Realm} from '@realm/react';
-import {Section} from './Section';
+import {Shelf} from './Shelf';
 
 export class Cubby extends Realm.Object<Cubby> {
   _id!: Realm.BSON.ObjectId;
   name!: string;
   description!: string;
-  sections!: Realm.List<Section>;
+  shelves!: Realm.List<Shelf>;
   userId?: Realm.BSON.ObjectId;
 
   static schema = {
@@ -15,22 +15,18 @@ export class Cubby extends Realm.Object<Cubby> {
       userId: 'string?',
       name: 'string',
       description: 'string',
-      sections: 'Section[]',
+      shelves: 'Shelf[]',
     },
     primaryKey: '_id',
   };
 
-  static generate(
-    name: string,
-    description: string,
-    userId?: Realm.BSON.ObjectId | undefined,
-  ) {
-    return {
-      _id: new Realm.BSON.ObjectId(),
-      name,
-      description,
-      sections: [],
-      userId,
-    };
+  addShelf(realm: Realm, shelf: Shelf, isWriteFromRealm: Boolean) {
+    if (!isWriteFromRealm) {
+      realm.write(() => {
+        this.shelves.push(shelf);
+      });
+    } else {
+      this.shelves.push(shelf);
+    }
   }
 }

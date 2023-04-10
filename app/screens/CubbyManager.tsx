@@ -1,6 +1,6 @@
 import React, {useMemo, useState} from 'react';
 import {useCallback} from 'react';
-import {StyleSheet, View} from 'react-native';
+import {StyleSheet, View, useWindowDimensions} from 'react-native';
 
 import {AddCubbyForm} from '../components/AddCubbyForm';
 import {IntroText} from '../components/IntroText';
@@ -8,7 +8,7 @@ import CubbyList from '../components/CubbyList';
 import {AppButton} from '../baseComponents/AppButton';
 
 import {Cubby} from '../models/Cubby';
-import {Section} from '../models/Section';
+import {Shelf} from '../models/Shelf';
 
 import {HomeScreenNavigationProp} from '../navigation/types';
 import {RealmContext} from '../models';
@@ -16,6 +16,7 @@ import {RealmContext} from '../models';
 const {useRealm, useQuery} = RealmContext;
 
 export const CubbyManager: React.FC<HomeScreenNavigationProp> = () => {
+  const {width} = useWindowDimensions();
   const realm = useRealm();
   const result = useQuery(Cubby);
   // TODO: Consider passing just an array to the CubbyList.
@@ -32,18 +33,22 @@ export const CubbyManager: React.FC<HomeScreenNavigationProp> = () => {
       }
 
       realm.write(() => {
-        const defaultSection: Section = realm.create('Section', {
+        const defaultShelf: Shelf = realm.create(Shelf, {
           _id: new Realm.BSON.ObjectID(),
-          name: 'default section',
-          colors: {},
+          _availableSpace: width,
+          name: 'Shelf 0',
+          books: [],
+          shelfWidth: width,
+          order: 0,
         });
 
-        const newCubby: Cubby = realm.create(
-          'Cubby',
-          Cubby.generate(name, description),
-        );
+        const newCubby: Cubby = realm.create(Cubby, {
+          _id: new Realm.BSON.ObjectID(),
+          name,
+          description,
+        });
 
-        newCubby.sections.push(defaultSection);
+        newCubby.shelves.push(defaultShelf);
 
         handleModalClose();
 

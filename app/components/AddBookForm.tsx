@@ -35,7 +35,7 @@ export const AddBookForm: React.FC<AddBookFormProps> = ({
   bookInfo,
 }) => {
   // TODO: Change this to add dropdown or tap selection for destination cubby.
-  // Ignore sections for now. Put all books in the default section.
+  // Ignore shelves for now. Put all books in the default shelf.
   const [destinationCubby, setDestinationCubby] = useState('No Cubby selected');
   const [destinationCubbyId, setDestinationCubbyId] = useState<
     Realm.BSON.ObjectId | undefined

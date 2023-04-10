@@ -1,18 +1,13 @@
-import React, {useState} from 'react';
-import {
-  Alert,
-  View,
-  StyleSheet,
-  useWindowDimensions,
-  ScrollView,
-} from 'react-native';
+import React from 'react';
+import {Alert, View, StyleSheet, ScrollView} from 'react-native';
 import {useRoute, useNavigation} from '@react-navigation/native';
 
 import {CubbyScreenNavigationProp} from '../navigation/types';
 import {HomeScreenNavigationProp} from '../navigation/types';
 import {CubbyScreenRouteProp} from '../navigation/types';
+
 import {Cubby} from '../models/Cubby';
-import {Book} from '../models/Book';
+import {Shelf} from '../models/Shelf';
 
 import {BookSlot} from '../components/BookSlot';
 import {AppButton} from '../baseComponents/AppButton';
@@ -20,74 +15,72 @@ import {AppText} from '../baseComponents/AppText';
 
 import {RealmContext} from '../models';
 
-const {useRealm, useObject} = RealmContext;
+const {useRealm, useObject, useQuery} = RealmContext;
 
-// TODO: Extract as an object model.
-class Shelf {
-  _id!: Realm.BSON.ObjectId;
-  books!: Book[];
-  shelfWidth!: number;
-  order!: number;
-  _availableSpace!: number;
+// class Shelf {
+//   _id!: Realm.BSON.ObjectId;
+//   books!: Book[];
+//   shelfWidth!: number;
+//   order!: number;
+//   _availableSpace!: number;
 
-  constructor(shelfWidth: number, order: number) {
-    this._id = new Realm.BSON.ObjectID();
-    this.books = [];
-    this.shelfWidth = shelfWidth;
-    this._availableSpace = shelfWidth;
-    this.order = order;
-  }
+//   constructor(shelfWidth: number, order: number) {
+//     this._id = new Realm.BSON.ObjectID();
+//     this.books = [];
+//     this.shelfWidth = shelfWidth;
+//     this._availableSpace = shelfWidth;
+//     this.order = order;
+//   }
 
-  get getAvailableSpace() {
-    return this._availableSpace;
-  }
+//   get getAvailableSpace() {
+//     return this._availableSpace;
+//   }
 
-  get getBooks() {
-    return this.books;
-  }
+//   get getBooks() {
+//     return this.books;
+//   }
 
-  setAvailableSpace() {
-    let spaceTaken = 0;
+//   setAvailableSpace() {
+//     let spaceTaken = 0;
 
-    if (!this.books.length) {
-      return spaceTaken;
-    }
+//     if (!this.books.length) {
+//       return spaceTaken;
+//     }
 
-    for (let index = 0; index < this.books.length; index++) {
-      const book = this.books[index];
-      const bookWidth = book.pageCount
-        ? Math.round((book.pageCount / this.shelfWidth) * 10) / 10
-        : 1;
-      const bookDisplayWidth = bookWidth * 100;
+//     for (let index = 0; index < this.books.length; index++) {
+//       const book = this.books[index];
+//       const bookThickness = book.pageCount
+//         ? Math.round(book.pageCount * 0.08)
+//         : 10;
+//       const bookWidth = Math.round((bookThickness / this.shelfWidth) * 100);
 
-      spaceTaken = spaceTaken + bookDisplayWidth;
-    }
+//       // PICK UP HERE: Need to reconcile this with actual book item width. Ideally, I can pass this on and not need to recalculate.
+//       // Look at calculateBookThickness() in `BookSlot`.
+//       const bookDisplayWidth = bookWidth * 10;
 
-    this._availableSpace = this.shelfWidth - spaceTaken;
-  }
+//       spaceTaken = spaceTaken + bookDisplayWidth;
+//     }
 
-  addBook(book: Book) {
-    this.books.push(book);
+//     this._availableSpace = this.shelfWidth - spaceTaken;
+//   }
 
-    this.setAvailableSpace();
-  }
-}
+//   addBook(book: Book) {
+//     this.books.push(book);
+
+//     this.setAvailableSpace();
+//   }
+// }
 
 const CubbyScreen: React.FC<CubbyScreenNavigationProp> = () => {
   const realm = useRealm();
   const route = useRoute<CubbyScreenRouteProp>();
   const navigation = useNavigation<HomeScreenNavigationProp>();
-  const {width, height} = useWindowDimensions();
 
   const {_id} = route.params;
 
-  const [shelfWidth, setShelfWidth] = useState(width);
-
   const cubbyObjectId = new Realm.BSON.ObjectID(_id);
   const cubby = useObject(Cubby, cubbyObjectId);
-  const books = cubby?.sections[0].books;
-
-  const allShelves = shelves(books, width, shelfWidth);
+  const shelves = useQuery(Shelf);
 
   const createAlert = () =>
     Alert.alert(
@@ -120,8 +113,8 @@ const CubbyScreen: React.FC<CubbyScreenNavigationProp> = () => {
       <View style={styles.cubbyContainer}>
         <AppText>{cubby!.description}</AppText>
 
-        <ScrollView>
-          {allShelves.map((shelf: Shelf) => {
+        <ScrollView style={styles.flexContainer}>
+          {shelves.map((shelf: Shelf) => {
             return (
               <ScrollView
                 key={shelf._id.toString()}
@@ -148,55 +141,10 @@ const CubbyScreen: React.FC<CubbyScreenNavigationProp> = () => {
   }
 };
 
-function shelves(
-  books: Realm.list<Book> | undefined,
-  width: number,
-  shelfWidth: number,
-) {
-  const newShelves: Shelf[] = [];
-  let currentShelf;
-  let availableSpace;
-
-  for (let index = 0; index < books!.length; index++) {
-    const book = books![index];
-
-    const bookWidth = book.pageCount
-      ? Math.round((book.pageCount / width) * 10) / 10
-      : 1;
-    const bookDisplayWidth = bookWidth * 100;
-    const bookHeight = book.title.length;
-    // TODO: Maybe update book object with this.
-    const bookDisplayHeight = bookHeight * 10;
-
-    if (!newShelves.length) {
-      const newShelf = new Shelf(shelfWidth, 0);
-
-      newShelves.push(newShelf);
-      currentShelf = newShelf;
-      availableSpace = currentShelf.getAvailableSpace;
-    } else {
-      // Get the last shelf in the array.
-      currentShelf = newShelves[newShelves.length - 1];
-      availableSpace = currentShelf.getAvailableSpace;
-    }
-
-    if (bookDisplayWidth > availableSpace) {
-      // TODO: abstract to re-useable function: createShelf
-      const newShelf = new Shelf(shelfWidth, newShelves.length);
-
-      newShelf.addBook(book);
-      newShelves.push(newShelf);
-      currentShelf = newShelf;
-      availableSpace = currentShelf.getAvailableSpace;
-    } else {
-      currentShelf.addBook(book);
-    }
-  }
-
-  return newShelves;
-}
-
 const styles = StyleSheet.create({
+  flexContainer: {
+    flex: 1,
+  },
   buttonGroup: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -209,8 +157,8 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   bookShelf: {
-    alignItems: 'flex-end',
     marginBottom: 30,
+    alignItems: 'flex-end',
   },
 });
 

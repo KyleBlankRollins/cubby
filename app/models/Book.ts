@@ -8,6 +8,8 @@ export class Book extends Realm.Object<Book> {
   publisher!: string;
   description!: string;
   infoLink!: string;
+  displayWidth!: number;
+  displayHeight!: number;
   subtitle?: string;
   industryIdentifiers?: Realm.List<Identifier>;
   pageCount?: number;
@@ -31,6 +33,8 @@ export class Book extends Realm.Object<Book> {
       publisher: 'string',
       description: 'string?',
       infoLink: 'string',
+      displayWidth: 'int',
+      displayHeight: 'int',
       industryIdentifiers: {
         type: 'list',
         objectType: 'Identifier',
@@ -50,10 +54,9 @@ export class Book extends Realm.Object<Book> {
       publishedDate: 'string?',
       imageLinks: 'ImageLinks?',
       userId: 'string?',
-      // TODO: Change this shelf object
       assignee: {
         type: 'linkingObjects',
-        objectType: 'Section',
+        objectType: 'Shelf',
         property: 'books',
       },
     },

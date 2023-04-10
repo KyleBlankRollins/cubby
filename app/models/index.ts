@@ -1,9 +1,9 @@
 import {createRealmContext} from '@realm/react';
 import {Book} from './Book';
 import {Cubby} from './Cubby';
-import {Section} from './Section';
+import {Shelf} from './Shelf';
 import {ImageLinks, Identifier} from './EmbeddedObjects';
 
 export const RealmContext = createRealmContext({
-  schema: [Book, Cubby, Section, ImageLinks, Identifier],
+  schema: [Book, Cubby, Shelf, ImageLinks, Identifier],
 });
