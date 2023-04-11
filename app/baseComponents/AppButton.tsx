@@ -1,5 +1,5 @@
 import React from 'react';
-import {StyleSheet, TouchableOpacity, ViewStyle} from 'react-native';
+import {StyleSheet, Pressable, ViewStyle} from 'react-native';
 
 import {AppButtonText} from './AppButtonText';
 
@@ -26,7 +26,7 @@ export const AppButton = React.memo<AppButtonProps>(
     const buttonWidth = options?.fullWidth ? styles.fullWidth : styles.fitWidth;
 
     return (
-      <TouchableOpacity
+      <Pressable
         onPress={onPress}
         style={[
           styles.appButtonContainer,
@@ -35,7 +35,7 @@ export const AppButton = React.memo<AppButtonProps>(
           options?.customStyle,
         ]}>
         <AppButtonText customStyle={textSize}> {title} </AppButtonText>
-      </TouchableOpacity>
+      </Pressable>
     );
   },
 );

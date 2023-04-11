@@ -63,7 +63,7 @@ export const BookScreen: React.FC<BookScreenNavigationProp> = () => {
   };
 
   const handleAddBook = useCallback(
-    (destinationCubbyId: Realm.BSON.ObjectId): void => {
+    (destinationCubbyId: Realm.BSON.ObjectId | undefined): void => {
       // TODO: Add alert about needing a destination cubby.
       if (!destinationCubbyId) {
         return;

@@ -2,10 +2,13 @@ import React, {useState} from 'react';
 import {
   Alert,
   FlatList,
-  SafeAreaView,
+  KeyboardAvoidingView,
   StyleSheet,
   TextInput,
   View,
+  useColorScheme,
+  Keyboard,
+  Pressable,
 } from 'react-native';
 
 import {AppButton} from '../baseComponents/AppButton';
@@ -14,14 +17,52 @@ import {FindBookScreenNavigationProp} from '../navigation/types';
 import {BookOverview} from '../components/BookOverview';
 import {GBOOKS_API_KEY, DEVICE_SHA} from '@env';
 
+import {light, lightStyles, dark, darkStyles} from '../styles/theme';
+import {AppButtonText} from '../baseComponents/AppButtonText';
+import {AdvancedSearchForm} from '../components/AdvancedSearchForm';
+
+// TODO: Add advanced search toggle and options: author (inauthor), subject (subject), isbn (isbn)
+
 export const FindBookScreen: React.FC<FindBookScreenNavigationProp> = () => {
   const [query, setQuery] = useState('');
   const [result, setResult] = useState();
   const [findBookButtonText, setFindBookButtonText] = useState('Find book');
-  const [resultMessage, setResultMessage] = useState('Search results here...');
+  const [resultMessage, setResultMessage] = useState('');
+  const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
+  const [opacityLevel, setOpacityLevel] = useState(1);
+
+  const isDarkMode = useColorScheme() === 'dark';
+  const themeStyles = isDarkMode ? darkStyles : lightStyles;
+  const fullThemeStyles = isDarkMode ? dark : light;
+
+  const handleModalClose = () => {
+    setShowAdvancedSearch(false);
+    setOpacityLevel(1);
+  };
+
+  const handleModalOpacity = () => {
+    return {
+      opacity: opacityLevel,
+    };
+  };
+
+  const handleAdvancedSearchSubmission = (
+    bookTitle?: string,
+    authorName?: string,
+    subject?: string,
+    isbn?: string,
+  ) => {
+    console.log(bookTitle);
+    console.log(authorName);
+    console.log(subject);
+    console.log(isbn);
+
+    // PICK UP HERE: Craft a refined search based on available parameters.
+
+    handleModalClose();
+  };
 
   // TODO: rewrite as serverless function
-  // TODO: Add options for search: author (inauthor), subject (subject), isbn (isbn)
   // TODO: Use Partial Response to get only the fields I want.
   // https://developers.google.com/books/docs/v1/performance#partial-response
   const requestBookByTitle = async () => {
@@ -46,9 +87,9 @@ export const FindBookScreen: React.FC<FindBookScreenNavigationProp> = () => {
       .then(data => {
         if (data.items && data.items.length) {
           setResult(data.items);
-          setQuery('');
+          // setQuery('');
           setFindBookButtonText('Find another book');
-          setResultMessage("Here's what we found!");
+          setResultMessage("Is this what you're looking for?");
 
           return data.items;
         } else {
@@ -65,29 +106,57 @@ export const FindBookScreen: React.FC<FindBookScreenNavigationProp> = () => {
       });
   };
 
+  const clearResults = () => {
+    setResult(undefined);
+    setResultMessage('');
+  };
+
   return (
-    <SafeAreaView style={styles.container}>
-      <View>
+    <View style={[styles.container, handleModalOpacity()]}>
+      <KeyboardAvoidingView style={styles.searchContainer}>
         {/* TODO: Add different search options. Like by author. */}
-        {!result && <AppText>Search for a book by its title</AppText>}
+        {!result && <AppText>Try searching for a book!</AppText>}
 
-        <TextInput
-          style={styles.input}
-          onChangeText={setQuery}
-          value={query}
-          placeholder="Example: Howl's Moving Castle"
-          // keyboardType="numeric"
-        />
+        <View style={styles.searchInput}>
+          <TextInput
+            style={[styles.input, themeStyles.surface3]}
+            onChangeText={setQuery}
+            value={query}
+            placeholder="Book title..."
+            placeholderTextColor={fullThemeStyles.text2}
+            onSubmitEditing={() => {
+              Keyboard.dismiss;
+              requestBookByTitle();
+            }}
+          />
 
-        <AppButton
-          title={findBookButtonText}
-          onPress={() => {
-            requestBookByTitle();
-          }}
-        />
-      </View>
+          <Pressable
+            style={[styles.searchInputClear, themeStyles.surface2]}
+            onPress={() => {
+              clearResults();
+            }}>
+            <AppButtonText>X</AppButtonText>
+          </Pressable>
+        </View>
 
-      <View>
+        <View style={styles.buttonGroup}>
+          <AppButton
+            title={findBookButtonText}
+            onPress={() => {
+              requestBookByTitle();
+            }}
+          />
+          <AppButton
+            title={'Advanced search'}
+            onPress={() => {
+              setShowAdvancedSearch(true);
+              setOpacityLevel(0.25);
+            }}
+          />
+        </View>
+      </KeyboardAvoidingView>
+
+      <View style={styles.resultsContainer}>
         <AppText>{resultMessage}</AppText>
         {result && (
           <FlatList
@@ -102,27 +171,51 @@ export const FindBookScreen: React.FC<FindBookScreenNavigationProp> = () => {
         )}
       </View>
 
-      {/* TODO: If book is already in realm, pass the Book object. If not, pass basic info. */}
-      {/* TODO: add prop for `isInRealm`. */}
-      {/* {bookInfo && <BookOverview bookInfo={result} />} */}
-    </SafeAreaView>
+      <AdvancedSearchForm
+        onSubmit={handleAdvancedSearchSubmission}
+        onClose={handleModalClose}
+        visible={showAdvancedSearch}
+      />
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   input: {
-    margin: 12,
+    marginVertical: 12,
     borderWidth: 1,
     padding: 10,
     fontSize: 20,
   },
   container: {
     flex: 1,
+    justifyContent: 'center',
     marginHorizontal: 14,
     marginVertical: 10,
   },
+  searchContainer: {
+    flex: 1,
+  },
+  resultsContainer: {
+    flex: 3,
+  },
+  searchInput: {
+    position: 'relative',
+  },
+  searchInputClear: {
+    position: 'absolute',
+    right: '5%',
+    top: '25%',
+    paddingHorizontal: 8,
+    borderRadius: 8,
+  },
   searchList: {
-    // width: '100%',
-    marginVertical: 40,
+    marginVertical: 20,
+  },
+  buttonGroup: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    marginVertical: 8,
   },
 });

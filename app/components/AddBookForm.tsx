@@ -2,7 +2,6 @@ import React, {useState, useMemo} from 'react';
 import {
   Modal,
   View,
-  TextInput,
   Pressable,
   Platform,
   StyleSheet,
@@ -23,11 +22,12 @@ const {useQuery} = RealmContext;
 
 type AddBookFormProps = {
   bookInfo: Book | BookMap;
-  onSubmit: (destinationCubbyId: Realm.BSON.ObjectId) => void;
+  onSubmit: (destinationCubbyId: Realm.BSON.ObjectId | undefined) => void;
   onClose: () => void;
   visible: boolean;
 };
 
+// TODO: Add bookInfo data in the form.
 export const AddBookForm: React.FC<AddBookFormProps> = ({
   onSubmit,
   onClose,
