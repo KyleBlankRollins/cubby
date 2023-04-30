@@ -9,14 +9,15 @@ const Tab = createBottomTabNavigator<BottomTabNavigatorParamList>();
 
 const BottomTabs = () => {
   return (
-    <Tab.Navigator>
+    <Tab.Navigator backBehavior="order">
+      {/* TODO: reconcile stack navigator with tab navigator
+      https://reactnavigation.org/docs/nesting-navigators/ */}
       <Tab.Screen
         name="Home"
         component={HomeStackNavigator}
         options={{headerShown: false}}
       />
       <Tab.Screen name="Find a book" component={FindBookScreen} />
-      {/* <Tab.Screen name="All books" component={} /> */}
     </Tab.Navigator>
   );
 };

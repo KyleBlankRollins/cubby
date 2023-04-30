@@ -8,6 +8,7 @@ import {HomeStackNavigatorParamList} from './types';
 import {AddCubbyForm} from '../components/AddCubbyForm';
 import {AddBookForm} from '../components/AddBookForm';
 import {BookScreen} from '../screens/BookScreen';
+import {SearchResultsList} from '../components/SearchResultsList';
 
 const HomeStack = createNativeStackNavigator<HomeStackNavigatorParamList>();
 
@@ -30,6 +31,13 @@ const HomeStackNavigator = () => {
         name="BookScreen"
         component={BookScreen} // TODO: Figure out why TS is mad
         options={{headerShown: false}}
+      />
+      <HomeStack.Screen
+        name="SearchResultsScreen"
+        component={SearchResultsList} // TODO: Figure out why TS is mad
+        options={() => ({
+          title: 'Search results',
+        })}
       />
       <HomeStack.Screen
         name="AddCubbyModal"

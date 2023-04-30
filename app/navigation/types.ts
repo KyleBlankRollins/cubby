@@ -1,6 +1,5 @@
 import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import type {RouteProp} from '@react-navigation/native';
-import {Cubby} from '../models/Cubby';
 import {BookMap} from '../models/gBookApiRaw';
 
 export type HomeStackNavigatorParamList = {
@@ -15,6 +14,9 @@ export type HomeStackNavigatorParamList = {
       isInRealm: boolean;
       rawBook?: BookMap;
     };
+  };
+  SearchResultsScreen: {
+    results: any;
   };
   AddCubbyModal: {};
   AddBookModal: {};
@@ -40,19 +42,14 @@ export type BookScreenNavigationProp = NativeStackNavigationProp<
   'CubbyManager' // All route possibilities for CubbyManager. Undefined means access to all routes.
 >;
 
-export type FindBookScreenNavigationProp = NativeStackNavigationProp<
-  HomeStackNavigatorParamList,
-  'CubbyManager' // All route possibilities for CubbyManager. Undefined means access to all routes.
->;
-
-// export type HomeScreenRouteProp = RouteProp<
-//   HomeStackNavigatorParamList,
-//   'CubbyManager'
-// >;
-
 export type CubbyScreenRouteProp = RouteProp<
   HomeStackNavigatorParamList,
   'CubbyScreen'
+>;
+
+export type SearchResultsRouteProp = RouteProp<
+  HomeStackNavigatorParamList,
+  'SearchResultsScreen'
 >;
 
 export type BookScreenRouteProp = RouteProp<

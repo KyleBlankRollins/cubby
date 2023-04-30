@@ -1,7 +1,6 @@
 import React, {useState} from 'react';
 import {
   Alert,
-  FlatList,
   KeyboardAvoidingView,
   StyleSheet,
   TextInput,
@@ -13,70 +12,65 @@ import {
 
 import {AppButton} from '../baseComponents/AppButton';
 import {AppText} from '../baseComponents/AppText';
-import {FindBookScreenNavigationProp} from '../navigation/types';
-import {BookOverview} from '../components/BookOverview';
+
 import {GBOOKS_API_KEY, DEVICE_SHA} from '@env';
 
 import {light, lightStyles, dark, darkStyles} from '../styles/theme';
 import {AppButtonText} from '../baseComponents/AppButtonText';
 import {AdvancedSearchForm} from '../components/AdvancedSearchForm';
 
-// TODO: Add advanced search toggle and options: author (inauthor), subject (subject), isbn (isbn)
-
-export const FindBookScreen: React.FC<FindBookScreenNavigationProp> = () => {
-  const [query, setQuery] = useState('');
+export const FindBookScreen = ({navigation}) => {
   const [result, setResult] = useState();
-  const [findBookButtonText, setFindBookButtonText] = useState('Find book');
-  const [resultMessage, setResultMessage] = useState('');
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
-  const [opacityLevel, setOpacityLevel] = useState(1);
+
+  const [bookTitle, setBookTitle] = useState('');
+  const [author, setAuthor] = useState('');
+  const [subject, setSubject] = useState('');
+  const [isbn, setIsbn] = useState('');
 
   const isDarkMode = useColorScheme() === 'dark';
   const themeStyles = isDarkMode ? darkStyles : lightStyles;
   const fullThemeStyles = isDarkMode ? dark : light;
 
-  const handleModalClose = () => {
-    setShowAdvancedSearch(false);
-    setOpacityLevel(1);
+  const SHA1 = DEVICE_SHA;
+  const PACKAGE_NAME = 'com.cubby';
+  const HEADERS = {
+    'Content-Type': 'application/json',
+    'X-Android-Package': PACKAGE_NAME,
+    'X-Android-Cert': SHA1,
   };
+  const APIKEY = GBOOKS_API_KEY;
 
-  const handleModalOpacity = () => {
-    return {
-      opacity: opacityLevel,
+  const requestAdvancedSearch = async () => {
+    const querySubstrings = {
+      bookTitle: bookTitle ? `intitle:${bookTitle}` : '',
+      author: author ? `inauthor:${author}` : '',
+      subject: subject ? `subject:${subject}` : '',
+      isbn: isbn ? `isbn:${isbn}` : '',
     };
-  };
 
-  const handleAdvancedSearchSubmission = (
-    bookTitle?: string,
-    authorName?: string,
-    subject?: string,
-    isbn?: string,
-  ) => {
-    console.log(bookTitle);
-    console.log(authorName);
-    console.log(subject);
-    console.log(isbn);
+    const dynamicQueryString = () => {
+      let constructedString: string;
 
-    // PICK UP HERE: Craft a refined search based on available parameters.
+      for (const key in querySubstrings) {
+        if (Object.prototype.hasOwnProperty.call(querySubstrings, key)) {
+          const substring = querySubstrings[key];
 
-    handleModalClose();
-  };
+          if (!substring) {
+          } else if (!constructedString) {
+            constructedString = substring;
+          } else {
+            constructedString = `${constructedString}+${substring}`;
+          }
+        }
+      }
 
-  // TODO: rewrite as serverless function
-  // TODO: Use Partial Response to get only the fields I want.
-  // https://developers.google.com/books/docs/v1/performance#partial-response
-  const requestBookByTitle = async () => {
-    const SHA1 = DEVICE_SHA;
-    const PACKAGE_NAME = 'com.cubby';
-    const HEADERS = {
-      'Content-Type': 'application/json',
-      'X-Android-Package': PACKAGE_NAME,
-      'X-Android-Cert': SHA1,
+      return constructedString;
     };
-    const APIKEY = GBOOKS_API_KEY;
-    const FETCH_LINK = `https://www.googleapis.com/books/v1/volumes?q=intitle:${query}&printType=books&key=${APIKEY}`;
 
-    await fetch(FETCH_LINK, {headers: HEADERS})
+    const DYNAMIC_FETCH_LINK = `https://www.googleapis.com/books/v1/volumes?q=${dynamicQueryString()}&printType=books&key=${APIKEY}`;
+
+    const results = await fetch(DYNAMIC_FETCH_LINK, {headers: HEADERS})
       .then(response => {
         if (!response.ok) {
           throw new Error(`HTTP error: ${response.status}`);
@@ -84,98 +78,132 @@ export const FindBookScreen: React.FC<FindBookScreenNavigationProp> = () => {
 
         return response.json();
       })
-      .then(data => {
-        if (data.items && data.items.length) {
-          setResult(data.items);
-          // setQuery('');
-          setFindBookButtonText('Find another book');
-          setResultMessage("Is this what you're looking for?");
+      .catch(error => {
+        console.error(`Failed request: ${error.message}`);
+        Alert.alert(`Failed request: ${error.message}`);
+      });
 
-          return data.items;
-        } else {
-          setResultMessage(
-            `Hmm... Couldn't find any books with titles that contain "${query}".`,
-          );
+    return results;
+  };
 
-          return;
+  // TODO: rewrite as serverless function
+  // TODO: Use Partial Response to get only the fields I want.
+  // https://developers.google.com/books/docs/v1/performance#partial-response
+  const requestBookByTitle = async () => {
+    const FETCH_LINK = `https://www.googleapis.com/books/v1/volumes?q=intitle:${bookTitle}&printType=books&key=${APIKEY}`;
+
+    const results = await fetch(FETCH_LINK, {headers: HEADERS})
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error: ${response.status}`);
         }
+
+        return response.json();
       })
       .catch(error => {
         console.error(`Failed request: ${error.message}`);
         Alert.alert(`Failed request: ${error.message}`);
       });
+
+    return results;
   };
 
   const clearResults = () => {
     setResult(undefined);
-    setResultMessage('');
+  };
+
+  const handleSearchRequest = async () => {
+    let data;
+
+    if (showAdvancedSearch) {
+      console.log('ran advanced search request');
+      data = await requestAdvancedSearch();
+
+      setResult(data.items);
+    } else {
+      console.log('ran basic search');
+      data = await requestBookByTitle();
+
+      setResult(data.items);
+    }
+
+    if (!data.items.length) {
+      Alert.alert(`Couldn't find a book with: ${bookTitle}`);
+    } else {
+      navigation.navigate('SearchResultsScreen', {
+        results: data.items,
+      });
+    }
+  };
+
+  // TODO: remove trailing/preceding white space. Add other validation.
+  const handleMutations = (mutationType: string, mutation: string) => {
+    const setters = {
+      title: setBookTitle,
+      author: setAuthor,
+      subject: setSubject,
+      isbn: setIsbn,
+    };
+
+    setters[mutationType](mutation);
   };
 
   return (
-    <View style={[styles.container, handleModalOpacity()]}>
+    <View style={styles.container}>
       <KeyboardAvoidingView style={styles.searchContainer}>
-        {/* TODO: Add different search options. Like by author. */}
         {!result && <AppText>Try searching for a book!</AppText>}
 
         <View style={styles.searchInput}>
-          <TextInput
-            style={[styles.input, themeStyles.surface3]}
-            onChangeText={setQuery}
-            value={query}
-            placeholder="Book title..."
-            placeholderTextColor={fullThemeStyles.text2}
-            onSubmitEditing={() => {
-              Keyboard.dismiss;
-              requestBookByTitle();
-            }}
-          />
+          {showAdvancedSearch ? (
+            // Shows more fields to search by.
+            // TODO: Fix layout and style issues.
+            <AdvancedSearchForm
+              values={{bookTitle, author, subject, isbn}}
+              handleMutations={handleMutations}
+              onClearResults={clearResults}
+            />
+          ) : (
+            // Default view that shows only searching by title.
+            <View>
+              <TextInput
+                style={[styles.input, themeStyles.surface3]}
+                onChangeText={setBookTitle}
+                value={bookTitle}
+                placeholder="Book title..."
+                placeholderTextColor={fullThemeStyles.text2}
+                onSubmitEditing={() => {
+                  Keyboard.dismiss;
+                  requestBookByTitle();
+                }}
+              />
 
-          <Pressable
-            style={[styles.searchInputClear, themeStyles.surface2]}
-            onPress={() => {
-              clearResults();
-            }}>
-            <AppButtonText>X</AppButtonText>
-          </Pressable>
+              <Pressable
+                style={[styles.searchInputClear, themeStyles.surface2]}
+                onPress={() => {
+                  setBookTitle('');
+                  clearResults();
+                }}>
+                <AppButtonText>X</AppButtonText>
+              </Pressable>
+            </View>
+          )}
         </View>
 
         <View style={styles.buttonGroup}>
           <AppButton
-            title={findBookButtonText}
+            title={'Find book'}
             onPress={() => {
-              requestBookByTitle();
+              handleSearchRequest();
             }}
           />
           <AppButton
             title={'Advanced search'}
             onPress={() => {
-              setShowAdvancedSearch(true);
-              setOpacityLevel(0.25);
+              setShowAdvancedSearch(!showAdvancedSearch);
             }}
           />
         </View>
       </KeyboardAvoidingView>
-
-      <View style={styles.resultsContainer}>
-        <AppText>{resultMessage}</AppText>
-        {result && (
-          <FlatList
-            style={styles.searchList}
-            data={result}
-            keyExtractor={result => result.id.toString()}
-            numColumns={2}
-            renderItem={({item}) => {
-              return <BookOverview bookInfo={item} />;
-            }}
-          />
-        )}
-      </View>
-
-      <AdvancedSearchForm
-        onSubmit={handleAdvancedSearchSubmission}
-        onClose={handleModalClose}
-        visible={showAdvancedSearch}
-      />
     </View>
   );
 };
@@ -196,10 +224,8 @@ const styles = StyleSheet.create({
   searchContainer: {
     flex: 1,
   },
-  resultsContainer: {
-    flex: 3,
-  },
   searchInput: {
+    flex: 1,
     position: 'relative',
   },
   searchInputClear: {
@@ -208,9 +234,6 @@ const styles = StyleSheet.create({
     top: '25%',
     paddingHorizontal: 8,
     borderRadius: 8,
-  },
-  searchList: {
-    marginVertical: 20,
   },
   buttonGroup: {
     flexDirection: 'row',
