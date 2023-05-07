@@ -1,58 +1,85 @@
 import React from 'react';
-import {StyleSheet, View, Pressable, TextInput} from 'react-native';
+import {
+  StyleSheet,
+  View,
+  Pressable,
+  TextInput,
+  useColorScheme,
+} from 'react-native';
 import {AppButtonText} from '../baseComponents/AppButtonText';
 
+import {light, lightStyles, dark, darkStyles} from '../styles/theme';
+
 type SearchParameterProps = {
-  setQuery: () => void;
+  value: string;
   parameterType: string;
   placeholderText: string;
+  handleMutations: (mutationType: string, mutation: string) => void;
+  onSubmitEditing: () => void;
+  onClearResults: (mutationType: string) => void;
 };
-// PICK UP HERE: Abstract parameter inputs into this component.
-export const SearchParameter = React.memo<AppButtonProps>(
-  ({onPress, title, bgColor, fullWidth}) => {
-    return (
-      <View>
-        <TextInput
-          style={[styles.input, themeStyles.surface3]}
-          onChangeText={setQuery}
-          value={query}
-          placeholder="Book title..."
-          placeholderTextColor={fullThemeStyles.text2}
-          onSubmitEditing={() => {
-            Keyboard.dismiss;
-            requestBookByTitle();
-          }}
-        />
 
-        <Pressable
-          style={[styles.searchInputClear, themeStyles.surface2]}
-          onPress={() => {
-            clearResults();
-          }}>
-          <AppButtonText>X</AppButtonText>
-        </Pressable>
-      </View>
-    );
-  },
-);
+export const SearchParameter: React.FC<SearchParameterProps> = ({
+  value,
+  parameterType,
+  placeholderText,
+  handleMutations,
+  onSubmitEditing,
+  onClearResults,
+}) => {
+  const isDarkMode = useColorScheme() === 'dark';
+  const themeStyles = isDarkMode ? darkStyles : lightStyles;
+  const fullThemeStyles = isDarkMode ? dark : light;
+
+  return (
+    <View style={styles.searchInput}>
+      <TextInput
+        style={[styles.input, themeStyles.surface3]}
+        onChangeText={text => {
+          handleMutations(parameterType, text);
+        }}
+        value={value}
+        placeholder={placeholderText}
+        placeholderTextColor={fullThemeStyles.text2}
+        onSubmitEditing={onSubmitEditing}
+      />
+
+      <Pressable
+        style={[styles.searchInputClear, themeStyles.surface2]}
+        onPress={() => {
+          onClearResults(parameterType);
+        }}>
+        <AppButtonText>X</AppButtonText>
+      </Pressable>
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
-  appButtonContainer: {
-    elevation: 4,
-    paddingVertical: 6,
+  searchInput: {
+    flex: 1,
+    flexDirection: 'row',
+    position: 'relative',
+    marginVertical: 12,
+    borderWidth: 1,
+    borderRadius: 8,
+  },
+  input: {
+    flex: 8,
+    padding: 10,
+    fontSize: 20,
+    borderTopLeftRadius: 8,
+    borderBottomLeftRadius: 8,
+  },
+  searchInputClear: {
+    // position: 'absolute',
+    // right: '5%',
+    // top: 0,
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
     paddingHorizontal: 8,
-  },
-  appButtonText: {
-    fontSize: 12,
-    color: '#fff',
-    fontWeight: 'bold',
-    alignSelf: 'center',
-  },
-  fullWidth: {
-    margin: 0,
-  },
-  fitWidth: {
-    marginHorizontal: 2,
-    marginVertical: 1,
+    borderTopRightRadius: 8,
+    borderBottomRightRadius: 8,
   },
 });

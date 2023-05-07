@@ -2,18 +2,15 @@ import React from 'react';
 import {View, FlatList, StyleSheet} from 'react-native';
 
 import {BookOverview} from '../components/BookOverview';
-import {AppHeaderText} from '../baseComponents/AppHeaderText';
-import {AppText} from '../baseComponents/AppText';
 import {useRoute} from '@react-navigation/native';
 import {SearchResultsRouteProp} from '../navigation/types';
 
-export const SearchResultsList: React.FC<SearchResultsList> = () => {
+export const SearchResultsList: React.FC = () => {
   const route = useRoute<SearchResultsRouteProp>();
   const results = route.params.results;
 
   return (
     <View style={styles.listContainer}>
-      {/* <AppText>{resultMessage}</AppText> */}
       <FlatList
         style={styles.searchList}
         data={results}
@@ -36,9 +33,5 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginHorizontal: 14,
     marginVertical: 10,
-    // height: 300,
-    // backgroundColor: '#fff',
-    // marginHorizontal: 20,
-    // justifyContent: 'center',
   },
 });

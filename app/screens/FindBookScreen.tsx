@@ -3,7 +3,7 @@ import {
   Alert,
   KeyboardAvoidingView,
   StyleSheet,
-  TextInput,
+  ScrollView,
   View,
   useColorScheme,
   Keyboard,
@@ -12,6 +12,7 @@ import {
 
 import {AppButton} from '../baseComponents/AppButton';
 import {AppText} from '../baseComponents/AppText';
+import {SearchParameter} from '../components/SearchParameter';
 
 import {GBOOKS_API_KEY, DEVICE_SHA} from '@env';
 
@@ -56,16 +57,15 @@ export const FindBookScreen = ({navigation}) => {
         if (Object.prototype.hasOwnProperty.call(querySubstrings, key)) {
           const substring = querySubstrings[key];
 
-          if (!substring) {
-          } else if (!constructedString) {
+          if (substring && !constructedString) {
             constructedString = substring;
-          } else {
+          } else if (substring) {
             constructedString = `${constructedString}+${substring}`;
           }
         }
       }
 
-      return constructedString;
+      return constructedString.trim();
     };
 
     const DYNAMIC_FETCH_LINK = `https://www.googleapis.com/books/v1/volumes?q=${dynamicQueryString()}&printType=books&key=${APIKEY}`;
@@ -108,7 +108,9 @@ export const FindBookScreen = ({navigation}) => {
     return results;
   };
 
-  const clearResults = () => {
+  const clearResults = (mutationType: string) => {
+    handleMutations(mutationType, '');
+
     setResult(undefined);
   };
 
@@ -116,18 +118,16 @@ export const FindBookScreen = ({navigation}) => {
     let data;
 
     if (showAdvancedSearch) {
-      console.log('ran advanced search request');
       data = await requestAdvancedSearch();
 
       setResult(data.items);
     } else {
-      console.log('ran basic search');
       data = await requestBookByTitle();
 
       setResult(data.items);
     }
 
-    if (!data.items.length) {
+    if (!data.items) {
       Alert.alert(`Couldn't find a book with: ${bookTitle}`);
     } else {
       navigation.navigate('SearchResultsScreen', {
@@ -136,7 +136,6 @@ export const FindBookScreen = ({navigation}) => {
     }
   };
 
-  // TODO: remove trailing/preceding white space. Add other validation.
   const handleMutations = (mutationType: string, mutation: string) => {
     const setters = {
       title: setBookTitle,
@@ -148,6 +147,7 @@ export const FindBookScreen = ({navigation}) => {
     setters[mutationType](mutation);
   };
 
+  // TODO: Add loading indicator when fetching results.
   return (
     <View style={styles.container}>
       <KeyboardAvoidingView style={styles.searchContainer}>
@@ -164,42 +164,35 @@ export const FindBookScreen = ({navigation}) => {
             />
           ) : (
             // Default view that shows only searching by title.
-            <View>
-              <TextInput
-                style={[styles.input, themeStyles.surface3]}
-                onChangeText={setBookTitle}
+            <ScrollView>
+              <SearchParameter
                 value={bookTitle}
-                placeholder="Book title..."
-                placeholderTextColor={fullThemeStyles.text2}
+                parameterType="title"
+                placeholderText="Book title..."
+                handleMutations={handleMutations}
                 onSubmitEditing={() => {
                   Keyboard.dismiss;
                   requestBookByTitle();
                 }}
+                onClearResults={() => {
+                  clearResults('title');
+                }}
               />
-
-              <Pressable
-                style={[styles.searchInputClear, themeStyles.surface2]}
-                onPress={() => {
-                  setBookTitle('');
-                  clearResults();
-                }}>
-                <AppButtonText>X</AppButtonText>
-              </Pressable>
-            </View>
+            </ScrollView>
           )}
         </View>
 
         <View style={styles.buttonGroup}>
           <AppButton
-            title={'Find book'}
-            onPress={() => {
-              handleSearchRequest();
-            }}
-          />
-          <AppButton
             title={'Advanced search'}
             onPress={() => {
               setShowAdvancedSearch(!showAdvancedSearch);
+            }}
+          />
+          <AppButton
+            title={'Find book'}
+            onPress={() => {
+              handleSearchRequest();
             }}
           />
         </View>
@@ -226,14 +219,6 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     flex: 1,
-    position: 'relative',
-  },
-  searchInputClear: {
-    position: 'absolute',
-    right: '5%',
-    top: '25%',
-    paddingHorizontal: 8,
-    borderRadius: 8,
   },
   buttonGroup: {
     flexDirection: 'row',
