@@ -40,15 +40,10 @@ const HomeStackNavigator = () => {
         })}
       />
       <HomeStack.Screen
-        name="AddCubbyModal"
+        name="AddCubbyScreen"
         component={AddCubbyForm} // TODO: Figure out why TS is mad
         options={{
-          presentation: 'modal',
           headerShown: false,
-          contentStyle: {
-            backgroundColor: 'transparent',
-            opacity: 0.99,
-          },
         }}
       />
       <HomeStack.Screen

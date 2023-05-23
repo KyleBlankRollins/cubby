@@ -18,7 +18,7 @@ export type HomeStackNavigatorParamList = {
   SearchResultsScreen: {
     results: any;
   };
-  AddCubbyModal: {};
+  AddCubbyScreen: {};
   AddBookModal: {};
 };
 
@@ -29,7 +29,8 @@ export type BottomTabNavigatorParamList = {
 
 export type HomeScreenNavigationProp = NativeStackNavigationProp<
   HomeStackNavigatorParamList,
-  'CubbyScreen' // All route possibilities for CubbyManager. Undefined means access to all routes.
+  'CubbyScreen',
+  'AddCubbyScreen' // All route possibilities for CubbyManager. Undefined means access to all routes.
 >;
 
 export type CubbyScreenNavigationProp = NativeStackNavigationProp<

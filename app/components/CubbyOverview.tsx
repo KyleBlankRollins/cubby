@@ -40,7 +40,7 @@ export const CubbyOverview = React.memo<CubbyOverviewProps>(({cubby}) => {
           </AppHeaderText>
         </View>
         <View style={styles.descriptionContainer}>
-          <AppText numberOfLines={1}>{cubby.description}</AppText>
+          <AppText numberOfLines={3}>{cubby.description}</AppText>
         </View>
       </View>
       <View style={styles.infoContainer}>
@@ -54,7 +54,6 @@ export const CubbyOverview = React.memo<CubbyOverviewProps>(({cubby}) => {
 
 const styles = StyleSheet.create({
   cubby: {
-    height: 150,
     alignSelf: 'stretch',
     flexDirection: 'row',
     marginVertical: 8,

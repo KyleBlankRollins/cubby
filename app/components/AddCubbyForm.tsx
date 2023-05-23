@@ -1,137 +1,191 @@
-import React, {useState} from 'react';
+import React, {useState, useCallback} from 'react';
 import {
-  Modal,
   View,
   TextInput,
   Pressable,
-  Platform,
+  ScrollView,
   StyleSheet,
   useColorScheme,
+  useWindowDimensions,
 } from 'react-native';
+import {useNavigation} from '@react-navigation/native';
 
-import {buttonStyles} from '../styles/button';
-import {lightStyles, darkStyles} from '../styles/theme';
-import {AppText} from '../baseComponents/AppText';
+import {light, lightStyles, dark, darkStyles} from '../styles/theme';
+import {AppButton} from '../baseComponents/AppButton';
+import {AppButtonText} from '../baseComponents/AppButtonText';
 
-type AddCubbyFormProps = {
-  onSubmit: (description: string, name: string) => void;
-  onClose: () => void;
-  visible: boolean;
-};
+import {Cubby} from '../models/Cubby';
+import {Shelf} from '../models/Shelf';
+import {HomeScreenNavigationProp} from '../navigation/types';
+import {RealmContext} from '../models';
 
-export const AddCubbyForm: React.FC<AddCubbyFormProps> = ({
-  onSubmit,
-  onClose,
-  visible,
-}) => {
+const {useRealm, useQuery} = RealmContext;
+
+export const AddCubbyForm: React.FC = () => {
+  const realm = useRealm();
+  const navigation = useNavigation<HomeScreenNavigationProp>();
+  const {width} = useWindowDimensions();
+
   const [description, setDescription] = useState('');
   const [name, setName] = useState('');
+  const [readyToSubmit, setReadyToSubmit] = useState(false);
 
   const isDarkMode = useColorScheme() === 'dark';
   const themeStyles = isDarkMode ? darkStyles : lightStyles;
+  const fullThemeStyles = isDarkMode ? dark : light;
 
-  const handleSubmit = () => {
-    onSubmit(description, name);
+  const handleAddCubby = useCallback(() => {
+    // TODO: Add alert about needing these.
+    if (!description || !name) {
+      return;
+    }
 
-    // Reset state
-    setDescription('');
-    setName('');
-  };
+    realm.write(() => {
+      const defaultShelf: Shelf = realm.create(Shelf, {
+        _id: new Realm.BSON.ObjectID(),
+        _availableSpace: width,
+        name: 'Shelf 0',
+        books: [],
+        shelfWidth: width,
+        order: 0,
+      });
 
-  const handleClose = () => {
-    onClose();
-  };
+      const newCubby: Cubby = realm.create(Cubby, {
+        _id: new Realm.BSON.ObjectID(),
+        name,
+        description,
+      });
+
+      newCubby.shelves.push(defaultShelf);
+
+      // TODO: Figure out how I messed up the navigation types
+      navigation.navigate('CubbyManager');
+    });
+  }, [realm, width, description, name, navigation]);
 
   return (
-    <Modal
-      visible={visible}
-      transparent={true}
-      animationType={'fade'}
-      onRequestClose={() => {
-        handleClose();
-      }}>
-      <View style={[styles.form, themeStyles.surface2]}>
-        <View style={styles.inputs}>
+    <View style={styles.container}>
+      <ScrollView
+        style={styles.formContainer}
+        contentContainerStyle={styles.listStyle}>
+        <View style={styles.textInput}>
           <TextInput
+            style={[styles.input, themeStyles.surface3]}
+            onChangeText={text => {
+              setName(text);
+
+              if (name && description) {
+                setReadyToSubmit(true);
+              }
+            }}
+            multiline={true}
             value={name}
-            placeholder="Cubby name"
-            // placeholderTextColor={colors.darkBlue}
-            onChangeText={setName}
-            autoCorrect={false}
-            autoCapitalize="none"
-            style={[
-              styles.textInput,
-              styles.textInputName,
-              themeStyles.surface3,
-            ]}
+            placeholder="Cubby name..."
+            placeholderTextColor={fullThemeStyles.text2}
           />
+
+          <Pressable
+            style={[styles.textInputClear, themeStyles.surface2]}
+            onPress={() => {
+              setName('');
+            }}>
+            <AppButtonText>X</AppButtonText>
+          </Pressable>
+        </View>
+
+        <View style={[styles.textInput, styles.descriptionInput]}>
           <TextInput
+            style={[styles.input, themeStyles.surface3]}
+            onChangeText={text => {
+              setDescription(text);
+
+              if (name && description) {
+                setReadyToSubmit(true);
+              }
+            }}
+            multiline={true}
             value={description}
-            placeholder="Cubby description"
-            // placeholderTextColor={colors.darkBlue}
-            onChangeText={setDescription}
-            autoCorrect={false}
-            autoCapitalize="none"
-            style={[
-              styles.textInput,
-              styles.textInputDescription,
-              themeStyles.surface3,
-            ]}
+            placeholder="Cubby description..."
+            placeholderTextColor={fullThemeStyles.text2}
+          />
+
+          <Pressable
+            style={[styles.textInputClear, themeStyles.surface2]}
+            onPress={() => {
+              setDescription('');
+            }}>
+            <AppButtonText>X</AppButtonText>
+          </Pressable>
+        </View>
+
+        <View style={styles.buttonGroup}>
+          <AppButton
+            onPress={() => {
+              // TODO: Figure out how I messed up the navigation types
+              navigation.navigate('CubbyManager');
+            }}
+            title="Cancel"
+          />
+          <AppButton
+            onPress={handleAddCubby}
+            title="Add!"
+            options={{
+              disabled: !readyToSubmit,
+            }}
           />
         </View>
-        <View style={styles.verticalButtonGroup}>
-          <Pressable onPress={handleSubmit} style={styles.submit}>
-            <AppText>＋</AppText>
-          </Pressable>
-          <Pressable onPress={handleClose} style={styles.submit}>
-            <AppText>X</AppText>
-          </Pressable>
-        </View>
-      </View>
-    </Modal>
+      </ScrollView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  form: {
-    flexDirection: 'row',
-    height: 150,
-    width: '100%',
-    position: 'absolute',
-    bottom: '40%',
-    right: 0,
-    paddingVertical: 8,
-    paddingHorizontal: 4,
-    // ...shadows,
-  },
-  inputs: {
+  container: {
     flex: 1,
+    marginHorizontal: 14,
+    marginVertical: 10,
+  },
+  formContainer: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+  },
+  listStyle: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginVertical: 'auto',
   },
   textInput: {
-    paddingHorizontal: 15,
-    paddingVertical: Platform.OS === 'ios' ? 15 : 0,
-    borderRadius: 5,
-    fontSize: 17,
+    height: 60,
+    flexDirection: 'row',
+    position: 'relative',
+    marginVertical: 12,
+    borderWidth: 1,
+    borderRadius: 8,
   },
-  textInputName: {
+  descriptionInput: {
+    height: 120,
+  },
+  input: {
+    flex: 8,
+    padding: 10,
+    fontSize: 20,
+    borderTopLeftRadius: 8,
+    borderBottomLeftRadius: 8,
+  },
+  textInputClear: {
     flex: 1,
-    marginBottom: 10,
-  },
-  textInputDescription: {
-    flex: 2,
-  },
-  submit: {
-    ...buttonStyles.button,
-    width: 50,
-    height: '50%',
-    paddingHorizontal: 0,
-    paddingVertical: 0,
-    marginVertical: 2,
-    marginLeft: 10,
-    marginRight: 0,
-  },
-  verticalButtonGroup: {
+    alignItems: 'center',
     justifyContent: 'center',
-    // marginVertical: 8,
+    paddingHorizontal: 8,
+    borderTopRightRadius: 8,
+    borderBottomRightRadius: 8,
+  },
+  buttonGroup: {
+    height: 60,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 36,
   },
 });

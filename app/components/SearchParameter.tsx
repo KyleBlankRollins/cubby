@@ -72,9 +72,6 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 8,
   },
   searchInputClear: {
-    // position: 'absolute',
-    // right: '5%',
-    // top: 0,
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',

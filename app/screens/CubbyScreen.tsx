@@ -57,7 +57,11 @@ const CubbyScreen: React.FC<CubbyScreenNavigationProp> = () => {
   } else {
     return (
       <View style={styles.cubbyContainer}>
+        {/* PICK UP HERE: IDs, shelves, and number of books are all over the place. Yet somehow all of the cubbies share the same rendering of books? */}
         <AppText>{cubby!.description}</AppText>
+        <AppText>{_id}</AppText>
+        <AppText>Number of shelves: {cubby!.shelves.length}</AppText>
+        <AppText>Number of books: {shelves[1]!.books.length}</AppText>
 
         <ScrollView style={styles.flexContainer}>
           {shelves.map((shelf: Shelf) => {
