@@ -12,6 +12,7 @@ import {Shelf} from '../models/Shelf';
 import {BookSlot} from '../components/BookSlot';
 import {AppButton} from '../baseComponents/AppButton';
 import {AppText} from '../baseComponents/AppText';
+import {HorizontalRule} from '../baseComponents/HorizontalRule';
 
 import {RealmContext} from '../models';
 
@@ -26,7 +27,6 @@ const CubbyScreen: React.FC<CubbyScreenNavigationProp> = () => {
 
   const cubbyObjectId = new Realm.BSON.ObjectID(_id);
   const cubby = useObject(Cubby, cubbyObjectId);
-  const shelves = useQuery(Shelf);
 
   const createAlert = () =>
     Alert.alert(
@@ -57,27 +57,40 @@ const CubbyScreen: React.FC<CubbyScreenNavigationProp> = () => {
   } else {
     return (
       <View style={styles.cubbyContainer}>
-        {/* PICK UP HERE: IDs, shelves, and number of books are all over the place. Yet somehow all of the cubbies share the same rendering of books? */}
         <AppText>{cubby!.description}</AppText>
-        <AppText>{_id}</AppText>
-        <AppText>Number of shelves: {cubby!.shelves.length}</AppText>
-        <AppText>Number of books: {shelves[1]!.books.length}</AppText>
+        <HorizontalRule />
 
-        <ScrollView style={styles.flexContainer}>
-          {shelves.map((shelf: Shelf) => {
-            return (
-              <ScrollView
-                key={shelf._id.toString()}
-                scrollEnabled={false}
-                horizontal={true}
-                contentContainerStyle={styles.bookShelf}>
-                {shelf.books.map(book => {
-                  return <BookSlot key={book._id.toString()} book={book} />;
-                })}
-              </ScrollView>
-            );
-          })}
-        </ScrollView>
+        {!cubby.shelves.length ? (
+          <View>
+            <View>
+              <AppText>No books in this Cubby yet!</AppText>
+            </View>
+          </View>
+        ) : (
+          <ScrollView style={styles.flexContainer}>
+            {cubby.shelves.map((shelf: Shelf) => {
+              if (shelf.books.length) {
+                return (
+                  <ScrollView
+                    key={shelf._id.toString()}
+                    scrollEnabled={false}
+                    horizontal={true}
+                    contentContainerStyle={styles.bookShelf}>
+                    {shelf.books.map(book => {
+                      return <BookSlot key={book._id.toString()} book={book} />;
+                    })}
+                  </ScrollView>
+                );
+              } else {
+                return (
+                  <View>
+                    <AppText>No books on this shelf.</AppText>
+                  </View>
+                );
+              }
+            })}
+          </ScrollView>
+        )}
 
         <View style={styles.buttonGroup}>
           <AppButton
