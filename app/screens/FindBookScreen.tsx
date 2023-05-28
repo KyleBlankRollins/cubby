@@ -5,9 +5,7 @@ import {
   StyleSheet,
   ScrollView,
   View,
-  useColorScheme,
   Keyboard,
-  Pressable,
 } from 'react-native';
 
 import {AppButton} from '../baseComponents/AppButton';
@@ -16,8 +14,6 @@ import {SearchParameter} from '../components/SearchParameter';
 
 import {GBOOKS_API_KEY, DEVICE_SHA} from '@env';
 
-import {light, lightStyles, dark, darkStyles} from '../styles/theme';
-import {AppButtonText} from '../baseComponents/AppButtonText';
 import {AdvancedSearchForm} from '../components/AdvancedSearchForm';
 
 export const FindBookScreen = ({navigation}) => {
@@ -28,10 +24,6 @@ export const FindBookScreen = ({navigation}) => {
   const [author, setAuthor] = useState('');
   const [subject, setSubject] = useState('');
   const [isbn, setIsbn] = useState('');
-
-  const isDarkMode = useColorScheme() === 'dark';
-  const themeStyles = isDarkMode ? darkStyles : lightStyles;
-  const fullThemeStyles = isDarkMode ? dark : light;
 
   const SHA1 = DEVICE_SHA;
   const PACKAGE_NAME = 'com.cubby';
@@ -147,13 +139,17 @@ export const FindBookScreen = ({navigation}) => {
     setters[mutationType](mutation);
   };
 
+  // SearchParameter has a height of 60. Dynamically change style for AdvancedSearchForm.
+  const searchInput = {
+    width: '100%',
+    height: !showAdvancedSearch ? 60 : 336,
+  };
+
   // TODO: Add loading indicator when fetching results.
   return (
     <View style={styles.container}>
       <KeyboardAvoidingView style={styles.searchContainer}>
-        {!result && <AppText>Try searching for a book!</AppText>}
-
-        <View style={styles.searchInput}>
+        <View style={searchInput}>
           {showAdvancedSearch ? (
             // Shows more fields to search by.
             // TODO: Fix layout and style issues.
@@ -164,7 +160,9 @@ export const FindBookScreen = ({navigation}) => {
             />
           ) : (
             // Default view that shows only searching by title.
-            <ScrollView>
+            <ScrollView
+              style={styles.searchParameterContainer}
+              contentContainerStyle={styles.listStyle}>
               <SearchParameter
                 value={bookTitle}
                 parameterType="title"
@@ -202,28 +200,31 @@ export const FindBookScreen = ({navigation}) => {
 };
 
 const styles = StyleSheet.create({
-  input: {
-    marginVertical: 12,
-    borderWidth: 1,
-    padding: 10,
-    fontSize: 20,
-  },
   container: {
     flex: 1,
-    justifyContent: 'center',
     marginHorizontal: 14,
     marginVertical: 10,
   },
   searchContainer: {
     flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  searchInput: {
+  searchParameterContainer: {
     flex: 1,
+    width: '100%',
+    height: '100%',
+  },
+  listStyle: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginVertical: 'auto',
   },
   buttonGroup: {
+    height: 60,
     flexDirection: 'row',
-    flexWrap: 'wrap',
     justifyContent: 'center',
-    marginVertical: 8,
+    marginTop: 36,
   },
 });

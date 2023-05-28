@@ -17,6 +17,7 @@ type SearchParameterProps = {
   handleMutations: (mutationType: string, mutation: string) => void;
   onSubmitEditing: () => void;
   onClearResults: (mutationType: string) => void;
+  height?: number;
 };
 
 export const SearchParameter: React.FC<SearchParameterProps> = ({
@@ -26,13 +27,16 @@ export const SearchParameter: React.FC<SearchParameterProps> = ({
   handleMutations,
   onSubmitEditing,
   onClearResults,
+  height,
 }) => {
   const isDarkMode = useColorScheme() === 'dark';
   const themeStyles = isDarkMode ? darkStyles : lightStyles;
   const fullThemeStyles = isDarkMode ? dark : light;
 
+  const customHeight = height ? {height: height} : null;
+
   return (
-    <View style={styles.searchInput}>
+    <View style={[styles.searchInput, customHeight]}>
       <TextInput
         style={[styles.input, themeStyles.surface3]}
         onChangeText={text => {
@@ -57,7 +61,7 @@ export const SearchParameter: React.FC<SearchParameterProps> = ({
 
 const styles = StyleSheet.create({
   searchInput: {
-    flex: 1,
+    height: 60,
     flexDirection: 'row',
     position: 'relative',
     marginVertical: 12,

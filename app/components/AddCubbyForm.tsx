@@ -19,7 +19,7 @@ import {Shelf} from '../models/Shelf';
 import {HomeScreenNavigationProp} from '../navigation/types';
 import {RealmContext} from '../models';
 
-const {useRealm, useQuery} = RealmContext;
+const {useRealm} = RealmContext;
 
 export const AddCubbyForm: React.FC = () => {
   const realm = useRealm();
