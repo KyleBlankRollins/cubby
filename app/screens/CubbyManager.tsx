@@ -17,7 +17,7 @@ const {useQuery} = RealmContext;
 export const CubbyManager: React.FC<HomeScreenNavigationProp> = () => {
   const navigation = useNavigation<HomeScreenNavigationProp>();
 
-  const result = useQuery(Cubby);
+  const result = useQuery(Cubby).sorted('name');
   // TODO: Consider passing just an array to the CubbyList.
   // Possibly no need for the actual objects in the list.
   const cubbies = useMemo(() => result.sorted('name'), [result]);

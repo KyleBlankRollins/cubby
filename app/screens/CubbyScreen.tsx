@@ -16,7 +16,7 @@ import {HorizontalRule} from '../baseComponents/HorizontalRule';
 
 import {RealmContext} from '../models';
 
-const {useRealm, useObject, useQuery} = RealmContext;
+const {useRealm, useObject} = RealmContext;
 
 const CubbyScreen: React.FC<CubbyScreenNavigationProp> = () => {
   const realm = useRealm();

@@ -35,7 +35,10 @@ export const CubbyOverview = React.memo<CubbyOverviewProps>(({cubby}) => {
       }>
       <View style={styles.overviewContainer}>
         <View style={styles.nameContainer}>
-          <AppHeaderText numberOfLines={1} level={2}>
+          <AppHeaderText
+            numberOfLines={1}
+            level={2}
+            customStyle={styles.smallerMargin}>
             {cubby.name}
           </AppHeaderText>
         </View>
@@ -86,5 +89,8 @@ const styles = StyleSheet.create({
   },
   books: {
     justifyContent: 'center',
+  },
+  smallerMargin: {
+    marginTop: 0,
   },
 });
