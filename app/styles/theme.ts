@@ -36,6 +36,7 @@ const light = {
   surface2: `hsl(${mainColor.hue}, 20%, 99%)`,
   surface3: `hsl(${mainColor.hue}, 20%, 92%)`,
   surface4: `hsl(${mainColor.hue}, 20%, 85%)`,
+  // TODO: add accent color surface
   shadow: `0 2.8px 2.2px hsl(${shadow.light.surfaceShadow} / ${shadow.light.shadowStrength} + .03)),
   0 6.7px 5.3px hsl(${shadow.light.surfaceShadow} / ${shadow.light.shadowStrength} + .01)),
   0 12.5px 10px hsl(${shadow.light.surfaceShadow} / ${shadow.light.shadowStrength} + .02)),
@@ -54,6 +55,7 @@ const dark = {
   surface2: `hsl(${mainColor.hue}, 10%, 15%)`,
   surface3: `hsl(${mainColor.hue}, 5%, 20%)`,
   surface4: `hsl(${mainColor.hue}, 5%, 25%)`,
+  // TODO: add accent color surface
   shadow: `0 2.8px 2.2px hsl(${shadow.dark.surfaceShadow} / ${shadow.dark.shadowStrength} + .03)),
   0 6.7px 5.3px hsl(${shadow.dark.surfaceShadow} / ${shadow.dark.shadowStrength} + .01)),
   0 12.5px 10px hsl(${shadow.dark.surfaceShadow} / ${shadow.dark.shadowStrength} + .02)),
@@ -79,6 +81,10 @@ const lightStyles = StyleSheet.create({
     backgroundColor: light.surface4,
     color: light.text1,
   },
+  accentSurface: {
+    backgroundColor: light.main,
+    color: light.text1,
+  },
   // TODO: Create a warning surface.
 });
 
@@ -97,6 +103,10 @@ const darkStyles = StyleSheet.create({
   },
   surface4: {
     backgroundColor: dark.surface4,
+    color: dark.text1,
+  },
+  accentSurface: {
+    backgroundColor: dark.main,
     color: dark.text1,
   },
   // TODO: Create a warning surface.

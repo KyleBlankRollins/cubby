@@ -11,10 +11,12 @@ import {useRoute, useNavigation} from '@react-navigation/native';
 import {BookScreenNavigationProp} from '../navigation/types';
 import {HomeScreenNavigationProp} from '../navigation/types';
 import {BookScreenRouteProp} from '../navigation/types';
+
 import {AppButton} from '../baseComponents/AppButton';
 import {AppText} from '../baseComponents/AppText';
 import {AppHeaderText} from '../baseComponents/AppHeaderText';
 import {AddBookForm} from '../components/AddBookForm';
+import {HorizontalRule} from '../baseComponents/HorizontalRule';
 
 import {Book} from '../models/Book';
 import {BookMap} from '../models/gBookApiRaw';
@@ -48,8 +50,6 @@ export const BookScreen: React.FC<BookScreenNavigationProp> = () => {
       return;
     }
   }, [realm, bookInfo, setBook]);
-
-  // TODO: Check if book is already in the realm, which means it's in a cubby. Show that info.
 
   const handleModalClose = () => {
     setBookFormVisible(false);
@@ -130,65 +130,81 @@ export const BookScreen: React.FC<BookScreenNavigationProp> = () => {
     );
   } else {
     return (
-      <ScrollView style={[styles.container, handleModalOpacity()]}>
-        <AppHeaderText level={2}>{book.title}</AppHeaderText>
-        <AppHeaderText level={4}>by {book.authors}</AppHeaderText>
-        <AppText>{book.categories}</AppText>
-
-        {/* TODO: Figure out how to programmatically chunk descriptions into paragraphs. */}
-        <AppText>{book.description}</AppText>
-
-        {/* TODO: Add placeholder for books with no cover */}
-        {book.imageLinks && (
+      <View style={styles.container}>
+        {/* PICK UP HERE: Figure out WTH is going on with flex here */}
+        <View style={styles.flexRow}>
+          <AppHeaderText level={2}>{book.title}</AppHeaderText>
+          {/* TODO: Add placeholder for books with no cover */}
           <Image
             style={styles.image}
             source={{
               uri: book.imageLinks!.thumbnail,
             }}
           />
-        )}
+        </View>
 
-        {bookInfo.isInRealm && (
-          <AppButton
-            title="Remove book"
-            onPress={() => {
-              //TODO: add confirmation
-              realm.write(() => {
-                realm.delete(book);
-              });
+        <ScrollView style={handleModalOpacity()}>
+          <View style={styles.flexRow}>
+            <AppHeaderText level={4}>by {book.authors}</AppHeaderText>
+          </View>
 
-              setBook(undefined);
+          <HorizontalRule />
 
-              bookInfo.isInRealm = false;
+          {bookInfo.isInRealm && (
+            <View style={styles.flexRow}>
+              {/* TODO: get info about cubby to add here, link to cubby screen */}
+              <AppText>in cubby</AppText>
 
-              // @ts-ignore
-              navigation.navigate('CubbyManager');
-            }}
+              <AppButton
+                title="Remove book"
+                onPress={() => {
+                  //TODO: add confirmation
+                  realm.write(() => {
+                    realm.delete(book);
+                  });
+
+                  setBook(undefined);
+
+                  bookInfo.isInRealm = false;
+
+                  // @ts-ignore
+                  navigation.navigate('CubbyManager');
+                }}
+              />
+            </View>
+          )}
+
+          {!bookInfo.isInRealm && (
+            <View style={styles.flexRow}>
+              <AppButton
+                onPress={() => {
+                  setBookFormVisible(true);
+                  setOpacityLevel(0.25);
+                }}
+                title="Add to Cubby"
+                options={{
+                  customStyle: styles.customButtonStyle,
+                  fullWidth: false,
+                  largeText: true,
+                }}
+              />
+            </View>
+          )}
+
+          <HorizontalRule />
+
+          <AppText>{book.categories}</AppText>
+          {/* TODO: Figure out how to programmatically chunk descriptions into paragraphs. */}
+          <AppText>{book.description}</AppText>
+
+          <AddBookForm
+            bookInfo={book}
+            onSubmit={handleAddBook}
+            onClose={handleModalClose}
+            visible={bookFormVisible}
           />
-        )}
-
-        {!bookInfo.isInRealm && (
-          <AppButton
-            onPress={() => {
-              setBookFormVisible(true);
-              setOpacityLevel(0.25);
-            }}
-            title="Add to Cubby"
-            options={{
-              customStyle: styles.customButtonStyle,
-              fullWidth: false,
-              largeText: true,
-            }}
-          />
-        )}
-
-        <AddBookForm
-          bookInfo={book}
-          onSubmit={handleAddBook}
-          onClose={handleModalClose}
-          visible={bookFormVisible}
-        />
-      </ScrollView>
+        </ScrollView>
+      </View>
     );
   }
 };
@@ -208,11 +224,17 @@ const styles = StyleSheet.create({
     marginHorizontal: 14,
     marginVertical: 10,
   },
+  flexRow: {
+    // flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+  },
   image: {
     resizeMode: 'cover',
-    height: 200,
-    width: 125,
-    marginRight: 10,
+    height: 175,
+    width: 100,
+    marginTop: 20,
   },
   customButtonStyle: {
     marginVertical: 30,

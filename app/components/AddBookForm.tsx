@@ -3,55 +3,54 @@ import {
   Modal,
   View,
   Pressable,
-  Platform,
   StyleSheet,
   useColorScheme,
+  useWindowDimensions,
   FlatList,
 } from 'react-native';
 
-import {buttonStyles} from '../styles/button';
-import {lightStyles, darkStyles} from '../styles/theme';
+import {light, lightStyles, dark, darkStyles} from '../styles/theme';
 import {AppText} from '../baseComponents/AppText';
+import {AppButton} from '../baseComponents/AppButton';
 
 import {Cubby} from '../models/Cubby';
-import {Book} from '../models/Book';
-import {BookMap} from '../models/gBookApiRaw';
 import {RealmContext} from '../models';
 
 const {useQuery} = RealmContext;
 
 type AddBookFormProps = {
-  bookInfo: Book | BookMap;
   onSubmit: (destinationCubbyId: Realm.BSON.ObjectId | undefined) => void;
   onClose: () => void;
   visible: boolean;
 };
 
-// TODO: Add bookInfo data in the form.
 export const AddBookForm: React.FC<AddBookFormProps> = ({
   onSubmit,
   onClose,
   visible,
-  bookInfo,
 }) => {
-  // TODO: Change this to add dropdown or tap selection for destination cubby.
-  // Ignore shelves for now. Put all books in the default shelf.
-  const [destinationCubby, setDestinationCubby] = useState('No Cubby selected');
+  const {width, height} = useWindowDimensions();
   const [destinationCubbyId, setDestinationCubbyId] = useState<
     Realm.BSON.ObjectId | undefined
   >();
+  const [selectedCubby, setSelectedCubby] = useState('');
+  const [readyToSubmit, setReadyToSubmit] = useState(false);
 
   const isDarkMode = useColorScheme() === 'dark';
   const themeStyles = isDarkMode ? darkStyles : lightStyles;
+  const themeColors = isDarkMode ? dark : light;
 
   const handleSubmit = () => {
     onSubmit(destinationCubbyId);
 
     // Reset state
-    setDestinationCubby('');
+    setReadyToSubmit(false);
+    setSelectedCubby('');
   };
 
   const handleClose = () => {
+    setReadyToSubmit(false);
+    setSelectedCubby('');
     onClose();
   };
 
@@ -59,13 +58,53 @@ export const AddBookForm: React.FC<AddBookFormProps> = ({
   const result = useQuery(Cubby);
   const cubbies = useMemo(() => result.sorted('name'), [result]);
 
+  const cubbyTile = {
+    justifyContent: 'center',
+    alignItems: 'center',
+    // Account for margin, padding, and constrained width.
+    width: (width - 124) / 2,
+    marginVertical: 6,
+    marginHorizontal: 4,
+    minHeight: 75,
+  };
+  const formStyles = {
+    position: 'absolute',
+    width: width - 100,
+    bottom: height * 0.2,
+    alignSelf: 'center',
+    paddingVertical: 20,
+    paddingHorizontal: 4,
+    borderStyle: 'solid',
+    borderWidth: 1,
+    borderColor: themeColors.surface3,
+  };
+  const idleBorder = {
+    borderStyle: 'solid',
+    borderWidth: 1,
+    borderColor: themeColors.surface4,
+  };
+  const activeBorder = {
+    borderStyle: 'solid',
+    borderWidth: 1,
+    borderColor: themeColors.main,
+  };
+
   const renderItem = (cubbyName: string, cubbyId: Realm.BSON.ObjectId) => {
     return (
       <Pressable
-        style={[styles.cubbySelector, themeStyles.surface3]}
+        style={[
+          cubbyTile,
+          cubbyName === selectedCubby
+            ? themeStyles.accentSurface
+            : themeStyles.surface3,
+          cubbyName === selectedCubby ? activeBorder : idleBorder,
+        ]}
         onPress={() => {
-          setDestinationCubby(cubbyName);
           setDestinationCubbyId(cubbyId);
+          setSelectedCubby(cubbyName);
+          if (selectedCubby) {
+            setReadyToSubmit(true);
+          }
         }}>
         <AppText> {cubbyName} </AppText>
       </Pressable>
@@ -80,52 +119,25 @@ export const AddBookForm: React.FC<AddBookFormProps> = ({
       onRequestClose={() => {
         handleClose();
       }}>
-      <View style={[styles.form, themeStyles.surface2]}>
+      <View style={[formStyles, themeStyles.surface2]}>
         <View style={styles.container}>
-          <AppText>{destinationCubby}</AppText>
           <AppText>Add to which Cubby?</AppText>
           <FlatList
             data={cubbies}
+            numColumns={2}
             keyExtractor={cubby => cubby._id.toString()}
             renderItem={({item}) => renderItem(item.name, item._id)}
           />
         </View>
-        {/* <View style={styles.inputs}>
-          <TextInput
-            value={name}
-            placeholder="Cubby name"
-            // placeholderTextColor={colors.darkBlue}
-            onChangeText={setName}
-            autoCorrect={false}
-            autoCapitalize="none"
-            style={[
-              styles.textInput,
-              styles.textInputName,
-              themeStyles.surface3,
-            ]}
+        <View style={styles.buttonGroup}>
+          <AppButton onPress={handleClose} title="Cancel" />
+          <AppButton
+            onPress={handleSubmit}
+            title="Add!"
+            options={{
+              disabled: !readyToSubmit,
+            }}
           />
-          <TextInput
-            value={description}
-            placeholder="Cubby description"
-            // placeholderTextColor={colors.darkBlue}
-            onChangeText={setDescription}
-            autoCorrect={false}
-            autoCapitalize="none"
-            style={[
-              styles.textInput,
-              styles.textInputDescription,
-              themeStyles.surface3,
-            ]}
-          />
-        </View>
-         */}
-        <View style={styles.verticalButtonGroup}>
-          <Pressable onPress={handleSubmit} style={styles.submit}>
-            <AppText>＋</AppText>
-          </Pressable>
-          <Pressable onPress={handleClose} style={styles.submit}>
-            <AppText>X</AppText>
-          </Pressable>
         </View>
       </View>
     </Modal>
@@ -133,49 +145,13 @@ export const AddBookForm: React.FC<AddBookFormProps> = ({
 };
 
 const styles = StyleSheet.create({
-  form: {
-    flexDirection: 'row',
-    height: 250,
-    width: '100%',
-    position: 'absolute',
-    bottom: '40%',
-    right: 0,
-    paddingVertical: 8,
-    paddingHorizontal: 4,
-    // ...shadows,
-  },
   container: {
     flex: 1,
   },
-  cubbySelector: {
-    borderWidth: 2,
-    borderColor: 'red',
-  },
-  textInput: {
-    paddingHorizontal: 15,
-    paddingVertical: Platform.OS === 'ios' ? 15 : 0,
-    borderRadius: 5,
-    fontSize: 17,
-  },
-  textInputName: {
-    flex: 1,
-    marginBottom: 10,
-  },
-  textInputDescription: {
-    flex: 2,
-  },
-  submit: {
-    ...buttonStyles.button,
-    width: 50,
-    height: '50%',
-    paddingHorizontal: 0,
-    paddingVertical: 0,
-    marginVertical: 2,
-    marginLeft: 10,
-    marginRight: 0,
-  },
-  verticalButtonGroup: {
+  buttonGroup: {
+    height: 60,
+    flexDirection: 'row',
     justifyContent: 'center',
-    // marginVertical: 8,
+    marginTop: 36,
   },
 });
