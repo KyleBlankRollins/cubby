@@ -4,6 +4,7 @@ import {
   View,
   Image,
   ScrollView,
+  useColorScheme,
   useWindowDimensions,
 } from 'react-native';
 import {useRoute, useNavigation} from '@react-navigation/native';
@@ -11,6 +12,7 @@ import {useRoute, useNavigation} from '@react-navigation/native';
 import {BookScreenNavigationProp} from '../navigation/types';
 import {HomeScreenNavigationProp} from '../navigation/types';
 import {BookScreenRouteProp} from '../navigation/types';
+import {light, dark, lightStyles, darkStyles} from '../styles/theme';
 
 import {AppButton} from '../baseComponents/AppButton';
 import {AppText} from '../baseComponents/AppText';
@@ -28,21 +30,43 @@ const {useRealm} = RealmContext;
 
 export const BookScreen: React.FC<BookScreenNavigationProp> = () => {
   const navigation = useNavigation<HomeScreenNavigationProp>();
+  const route = useRoute<BookScreenRouteProp>();
+  const isDarkMode = useColorScheme() === 'dark';
   const {width} = useWindowDimensions();
+
   const [bookFormVisible, setBookFormVisible] = useState(false);
   const [opacityLevel, setOpacityLevel] = useState(1);
+  const [cubby, setCubby] = useState<Cubby | null>(null);
   const [book, setBook] = useState<Book | BookMap>();
 
-  const route = useRoute<BookScreenRouteProp>();
   const {bookInfo} = route.params;
 
   const realm = useRealm();
+
+  const themeStyles = isDarkMode ? darkStyles : lightStyles;
+  const themeColors = isDarkMode ? dark : light;
 
   useEffect(() => {
     if (bookInfo.isInRealm) {
       // If the book already exists in the realm, find the realm object, then set it as the book.
       const realmBook = realm.objectForPrimaryKey(Book, bookInfo._id);
       setBook(realmBook);
+
+      // Get the book's linking shelf objects.
+      const bookShelf: Realm.Results<Shelf> = realmBook!.linkingObjects(
+        'Shelf',
+        'books',
+      );
+
+      // Get the shelf's linking cubby objects.
+      const results: Realm.Results<Cubby> = bookShelf[0].linkingObjects(
+        'Cubby',
+        'shelves',
+      );
+
+      // Finally, get the book's parent cubby object.
+      const bookCubby = results[0];
+      setCubby(bookCubby);
     } else {
       // If not in the realm, set the book to the raw data.
       setBook(bookInfo.rawBook);
@@ -122,6 +146,18 @@ export const BookScreen: React.FC<BookScreenNavigationProp> = () => {
     [realm, bookInfo, width],
   );
 
+  const cubbyStatus = {
+    backgroundColor: themeColors.main,
+    opacity: 0.9,
+    paddingVertical: 8,
+    paddingHorizontal: 4,
+  };
+
+  const titleBlock = {
+    maxWidth: width * 0.6,
+    marginRight: 20,
+  };
+
   if (!book) {
     return (
       <View>
@@ -131,32 +167,39 @@ export const BookScreen: React.FC<BookScreenNavigationProp> = () => {
   } else {
     return (
       <View style={styles.container}>
-        {/* PICK UP HERE: Figure out WTH is going on with flex here */}
-        <View style={styles.flexRow}>
-          <AppHeaderText level={2}>{book.title}</AppHeaderText>
-          {/* TODO: Add placeholder for books with no cover */}
-          <Image
-            style={styles.image}
-            source={{
-              uri: book.imageLinks!.thumbnail,
-            }}
-          />
-        </View>
-
-        <ScrollView style={handleModalOpacity()}>
+        <ScrollView style={handleModalOpacity()} stickyHeaderIndices={[2]}>
           <View style={styles.flexRow}>
-            <AppHeaderText level={4}>by {book.authors}</AppHeaderText>
+            <View style={titleBlock}>
+              <AppHeaderText level={2} customStyle={styles.title}>
+                {book.title}
+              </AppHeaderText>
+              <AppHeaderText level={4}>by {book.authors}</AppHeaderText>
+            </View>
+            {/* TODO: Add placeholder for books with no cover */}
+            {book.imageLinks && (
+              <Image
+                style={styles.image}
+                source={{
+                  uri: book.imageLinks!.thumbnail,
+                }}
+              />
+            )}
           </View>
 
           <HorizontalRule />
 
+          {/* PICK UP HERE: Now this has flex issues. Figure out WTH is going on. */}
           {bookInfo.isInRealm && (
-            <View style={styles.flexRow}>
-              {/* TODO: get info about cubby to add here, link to cubby screen */}
-              <AppText>in cubby</AppText>
+            <View style={[styles.flexRow, cubbyStatus]}>
+              <View style={styles.flex}>
+                <AppText>in Cubby: {cubby?.name}</AppText>
+              </View>
 
               <AppButton
                 title="Remove book"
+                options={{
+                  customStyle: {width: 200, opacity: 0.7},
+                }}
                 onPress={() => {
                   //TODO: add confirmation
                   realm.write(() => {
@@ -175,7 +218,11 @@ export const BookScreen: React.FC<BookScreenNavigationProp> = () => {
           )}
 
           {!bookInfo.isInRealm && (
-            <View style={styles.flexRow}>
+            <View style={[styles.flexRow, cubbyStatus]}>
+              <View style={styles.flex}>
+                <AppText>Not in a Cubby yet...</AppText>
+              </View>
+
               <AppButton
                 onPress={() => {
                   setBookFormVisible(true);
@@ -183,7 +230,6 @@ export const BookScreen: React.FC<BookScreenNavigationProp> = () => {
                 }}
                 title="Add to Cubby"
                 options={{
-                  customStyle: styles.customButtonStyle,
                   fullWidth: false,
                   largeText: true,
                 }}
@@ -198,7 +244,6 @@ export const BookScreen: React.FC<BookScreenNavigationProp> = () => {
           <AppText>{book.description}</AppText>
 
           <AddBookForm
-            bookInfo={book}
             onSubmit={handleAddBook}
             onClose={handleModalClose}
             visible={bookFormVisible}
@@ -225,19 +270,19 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   flexRow: {
-    // flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-around',
+    justifyContent: 'center',
+  },
+  flex: {
+    flex: 1,
+  },
+  title: {
+    marginTop: 0,
   },
   image: {
     resizeMode: 'cover',
     height: 175,
     width: 100,
-    marginTop: 20,
-  },
-  customButtonStyle: {
-    marginVertical: 30,
-    width: 300,
   },
 });
