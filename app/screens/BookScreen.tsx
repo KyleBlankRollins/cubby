@@ -1,18 +1,20 @@
 import React, {useState, useCallback, useEffect} from 'react';
 import {
+  Alert,
   StyleSheet,
   View,
   Image,
   ScrollView,
   useColorScheme,
   useWindowDimensions,
+  ViewStyle,
 } from 'react-native';
 import {useRoute, useNavigation} from '@react-navigation/native';
 
 import {BookScreenNavigationProp} from '../navigation/types';
 import {HomeScreenNavigationProp} from '../navigation/types';
 import {BookScreenRouteProp} from '../navigation/types';
-import {light, dark, lightStyles, darkStyles} from '../styles/theme';
+import {light, dark} from '../styles/theme';
 
 import {AppButton} from '../baseComponents/AppButton';
 import {AppText} from '../baseComponents/AppText';
@@ -43,8 +45,21 @@ export const BookScreen: React.FC<BookScreenNavigationProp> = () => {
 
   const realm = useRealm();
 
-  const themeStyles = isDarkMode ? darkStyles : lightStyles;
   const themeColors = isDarkMode ? dark : light;
+
+  const createAlert = () =>
+    Alert.alert(
+      `${book!.title}`,
+      'Are you sure you want to remove this book?',
+      [
+        {
+          text: 'Cancel',
+          onPress: () => console.log('Cancel Pressed'),
+          style: 'cancel',
+        },
+        {text: 'Yes', onPress: () => handleRemoveBook(book as Book)},
+      ],
+    );
 
   useEffect(() => {
     if (bookInfo.isInRealm) {
@@ -86,9 +101,26 @@ export const BookScreen: React.FC<BookScreenNavigationProp> = () => {
     };
   };
 
+  const handleRemoveBook = (
+    bookToRemove: (Book & Realm.Object<Book, never>) | null,
+  ): void => {
+    realm.write(() => {
+      realm.delete(bookToRemove);
+    });
+
+    setBook(undefined);
+
+    bookInfo.isInRealm = false;
+
+    // @ts-ignore
+    navigation.navigate('CubbyScreen', {
+      name: cubby!.name,
+      _id: cubby!._id.toString(),
+    });
+  };
+
   const handleAddBook = useCallback(
     (destinationCubbyId: Realm.BSON.ObjectId | undefined): void => {
-      // TODO: Add alert about needing a destination cubby.
       if (!destinationCubbyId) {
         return;
       }
@@ -146,17 +178,32 @@ export const BookScreen: React.FC<BookScreenNavigationProp> = () => {
     [realm, bookInfo, width],
   );
 
-  const cubbyStatus = {
+  const cubbyStatus: ViewStyle = {
+    flexDirection: 'row',
+    justifyContent: 'center',
     backgroundColor: themeColors.main,
     opacity: 0.9,
     paddingVertical: 8,
     paddingHorizontal: 4,
   };
 
-  const titleBlock = {
+  const titleBlock: ViewStyle = {
     maxWidth: width * 0.6,
     marginRight: 20,
   };
+
+  const categoryLabel: ViewStyle = {
+    backgroundColor: themeColors.main,
+    alignSelf: 'center',
+    paddingHorizontal: 8,
+    elevation: 4,
+    marginBottom: 20,
+  };
+
+  // TODO: Improve formatting, move transformation to when book is created.
+  const formattedDescription = book?.description
+    ? book?.description.replace(/•/g, '\n•').replace(/\.(\s+)(?!\.)/g, '.\n\n')
+    : "Couldn't find a description for this book...";
 
   if (!book) {
     return (
@@ -175,7 +222,7 @@ export const BookScreen: React.FC<BookScreenNavigationProp> = () => {
               </AppHeaderText>
               <AppHeaderText level={4}>by {book.authors}</AppHeaderText>
             </View>
-            {/* TODO: Add placeholder for books with no cover */}
+
             {book.imageLinks && (
               <Image
                 style={styles.image}
@@ -188,60 +235,46 @@ export const BookScreen: React.FC<BookScreenNavigationProp> = () => {
 
           <HorizontalRule />
 
-          {/* PICK UP HERE: Now this has flex issues. Figure out WTH is going on. */}
           {bookInfo.isInRealm && (
-            <View style={[styles.flexRow, cubbyStatus]}>
-              <View style={styles.flex}>
-                <AppText>in Cubby: {cubby?.name}</AppText>
+            <View style={styles.flex}>
+              <View style={cubbyStatus}>
+                <AppText customStyle={styles.cubbyName}>{cubby?.name}</AppText>
+
+                <AppButton title="Remove book" onPress={createAlert} />
               </View>
-
-              <AppButton
-                title="Remove book"
-                options={{
-                  customStyle: {width: 200, opacity: 0.7},
-                }}
-                onPress={() => {
-                  //TODO: add confirmation
-                  realm.write(() => {
-                    realm.delete(book);
-                  });
-
-                  setBook(undefined);
-
-                  bookInfo.isInRealm = false;
-
-                  // @ts-ignore
-                  navigation.navigate('CubbyManager');
-                }}
-              />
             </View>
           )}
 
           {!bookInfo.isInRealm && (
-            <View style={[styles.flexRow, cubbyStatus]}>
-              <View style={styles.flex}>
-                <AppText>Not in a Cubby yet...</AppText>
-              </View>
+            <View style={styles.flex}>
+              <View style={[styles.flexRow, cubbyStatus]}>
+                <AppText customStyle={styles.cubbyName}>Not added...</AppText>
 
-              <AppButton
-                onPress={() => {
-                  setBookFormVisible(true);
-                  setOpacityLevel(0.25);
-                }}
-                title="Add to Cubby"
-                options={{
-                  fullWidth: false,
-                  largeText: true,
-                }}
-              />
+                <AppButton
+                  onPress={() => {
+                    setBookFormVisible(true);
+                    setOpacityLevel(0.25);
+                  }}
+                  title="Add to Cubby"
+                />
+              </View>
             </View>
           )}
 
           <HorizontalRule />
 
-          <AppText>{book.categories}</AppText>
-          {/* TODO: Figure out how to programmatically chunk descriptions into paragraphs. */}
-          <AppText>{book.description}</AppText>
+          {book.categories
+            ? book.categories.map((category: string) => {
+                return (
+                  <CategoryLabelElement
+                    category={category}
+                    categoryStyle={categoryLabel}
+                  />
+                );
+              })
+            : null}
+
+          <AppText>{formattedDescription}</AppText>
 
           <AddBookForm
             onSubmit={handleAddBook}
@@ -252,6 +285,22 @@ export const BookScreen: React.FC<BookScreenNavigationProp> = () => {
       </View>
     );
   }
+};
+
+type categoryProp = {
+  category: string;
+  categoryStyle: ViewStyle;
+};
+
+const CategoryLabelElement: React.FC<categoryProp> = ({
+  category,
+  categoryStyle,
+}) => {
+  return (
+    <View style={categoryStyle}>
+      <AppText>{category}</AppText>
+    </View>
+  );
 };
 
 function calculateBookThickness(pageCount: number, shelfWidth: number): number {
@@ -279,6 +328,11 @@ const styles = StyleSheet.create({
   },
   title: {
     marginTop: 0,
+  },
+  cubbyName: {
+    marginVertical: 0,
+    marginRight: 20,
+    alignSelf: 'center',
   },
   image: {
     resizeMode: 'cover',
