@@ -16,6 +16,12 @@ const BottomTabs = () => {
   const isDarkMode = useColorScheme() === 'dark';
   const themeColors = isDarkMode ? dark : light;
 
+  const textStyle = {
+    fontSize: 20,
+    margin: 0,
+    padding: 0,
+  };
+
   return (
     <Tab.Navigator backBehavior="order">
       {/* TODO: reconcile stack navigator with tab navigator
@@ -25,8 +31,9 @@ const BottomTabs = () => {
         component={HomeStackNavigator}
         options={{
           headerShown: false,
-          tabBarActiveTintColor: themeColors.main,
+          tabBarActiveTintColor: themeColors.mainLight,
           tabBarLabelPosition: 'beside-icon',
+          tabBarLabelStyle: textStyle,
           tabBarIcon: ({color, size}) => (
             <Icon name="bookshelf" color={color} size={size} />
           ),
@@ -36,8 +43,9 @@ const BottomTabs = () => {
         name="Find a book"
         component={FindBookScreen}
         options={{
-          tabBarActiveTintColor: themeColors.main,
+          tabBarActiveTintColor: themeColors.mainLight,
           tabBarLabelPosition: 'beside-icon',
+          tabBarLabelStyle: textStyle,
           tabBarIcon: ({color, size}) => (
             <Icon name="book-search" color={color} size={size} />
           ),

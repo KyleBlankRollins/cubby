@@ -30,6 +30,7 @@ const shadow = {
 
 const light = {
   main: `hsl(${mainColor.hue}, ${mainColor.saturation}%, ${mainColor.lightness}%)`,
+  mainLight: `hsl(${mainColor.hue}, ${mainColor.saturation}%, ${mainColor.lightness}%)`,
   text1: `hsl(${mainColor.hue}, ${mainColor.saturation}%, 10%)`,
   text2: `hsl(${mainColor.hue}, 30%, 30%)`,
   surface1: `hsl(${mainColor.hue}, 25%, 90%)`,
@@ -49,6 +50,7 @@ const dark = {
   main: `hsl(${mainColor.hue}, ${mainColor.saturation / 2}%, ${
     mainColor.lightness / 1.5
   }%)`,
+  mainLight: `hsl(${mainColor.hue}, ${mainColor.saturation}%, ${mainColor.lightness}%)`,
   text1: `hsl(${mainColor.hue}, 15%, 85%)`,
   text2: `hsl(${mainColor.hue}, 5%, 65%)`,
   surface1: `hsl(${mainColor.hue}, 10%, 10%)`,
