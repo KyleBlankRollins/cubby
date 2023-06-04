@@ -67,7 +67,7 @@ const CubbyScreen: React.FC<CubbyScreenNavigationProp> = () => {
             </View>
           </View>
         ) : (
-          <ScrollView style={styles.flexContainer}>
+          <ScrollView style={styles.flexContainer} >
             {cubby.shelves.map((shelf: Shelf) => {
               if (shelf.books.length) {
                 return (
@@ -83,7 +83,7 @@ const CubbyScreen: React.FC<CubbyScreenNavigationProp> = () => {
                 );
               } else {
                 return (
-                  <View>
+                  <View key={shelf._id.toString()}>
                     <AppText>No books on this shelf.</AppText>
                   </View>
                 );
@@ -95,7 +95,7 @@ const CubbyScreen: React.FC<CubbyScreenNavigationProp> = () => {
         <View style={styles.buttonGroup}>
           <AppButton
             title="Delete Cubby"
-            options={{bgColor: '#5F2234', fullWidth: true}}
+            options={{isWarning: true}}
             onPress={createAlert}
           />
         </View>
