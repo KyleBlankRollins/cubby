@@ -9,7 +9,6 @@ import {
 } from 'react-native';
 
 import {AppButton} from '../baseComponents/AppButton';
-import {AppText} from '../baseComponents/AppText';
 import {SearchParameter} from '../components/SearchParameter';
 
 import {GBOOKS_API_KEY, DEVICE_SHA} from '@env';
@@ -17,7 +16,6 @@ import {GBOOKS_API_KEY, DEVICE_SHA} from '@env';
 import {AdvancedSearchForm} from '../components/AdvancedSearchForm';
 
 export const FindBookScreen = ({navigation}) => {
-  const [result, setResult] = useState();
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
 
   const [bookTitle, setBookTitle] = useState('');
@@ -102,8 +100,6 @@ export const FindBookScreen = ({navigation}) => {
 
   const clearResults = (mutationType: string) => {
     handleMutations(mutationType, '');
-
-    setResult(undefined);
   };
 
   const handleSearchRequest = async () => {
@@ -111,12 +107,8 @@ export const FindBookScreen = ({navigation}) => {
 
     if (showAdvancedSearch) {
       data = await requestAdvancedSearch();
-
-      setResult(data.items);
     } else {
       data = await requestBookByTitle();
-
-      setResult(data.items);
     }
 
     if (!data.items) {
@@ -223,8 +215,9 @@ const styles = StyleSheet.create({
   },
   buttonGroup: {
     height: 60,
+    width: '100%',
     flexDirection: 'row',
-    justifyContent: 'center',
+    justifyContent: 'space-around',
     marginTop: 36,
   },
 });

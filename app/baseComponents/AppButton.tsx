@@ -5,6 +5,7 @@ import {
   Pressable,
   ViewStyle,
   useColorScheme,
+  Easing,
 } from 'react-native';
 
 import {light, dark} from '../styles/theme';
@@ -26,51 +27,47 @@ export const AppButton = React.memo<AppButtonProps>(
   ({onPress, title, options}) => {
     const isDarkMode = useColorScheme() === 'dark';
 
-    const [animationSurface, setAnimationSurface] = useState(
-      new Animated.Value(0),
-    );
-    const [animationAccent, setAnimationAccent] = useState(
-      new Animated.Value(0),
-    );
-    const [isPressed, setIsPressed] = useState(false);
+    const [animation, setAnimationSurface] = useState(new Animated.Value(0));
 
     const themeColors = isDarkMode ? dark : light;
 
     // Animations
-    const animationToAccent = () => {
-      Animated.timing(animationSurface, {
+    // TODO: abstract animation stuff to a hook that can animate from one color to another.
+    const animateToAccent = () => {
+      Animated.timing(animation, {
         toValue: 1,
-        duration: 500,
+        easing: Easing.inOut(Easing.ease),
+        duration: 300,
+        useNativeDriver: false,
+      }).start();
+    };
+    const animateFromAccent = () => {
+      Animated.timing(animation, {
+        toValue: 0,
+        easing: Easing.inOut(Easing.ease),
+        duration: 300,
         useNativeDriver: false,
       }).start();
     };
 
-    const animationToSurface = () => {
-      Animated.timing(animationAccent, {
-        toValue: 1,
-        duration: 100,
-        useNativeDriver: false,
-      }).start();
-    };
+    const bgStartColor = options?.isWarning
+      ? themeColors.warning[300]
+      : themeColors.accent[500];
 
-    const surfaceInterpolation = animationSurface.interpolate({
+    const colorInterpolation = animation.interpolate({
       inputRange: [0, 1],
-      outputRange: [themeColors.surface2, themeColors.accent[500]],
-    }) as any;
-
-    const accentInterpolation = animationSurface.interpolate({
-      inputRange: [0, 1],
-      outputRange: [themeColors.accent[500], themeColors.surface2],
+      outputRange: [themeColors.surface2, bgStartColor],
     }) as any;
 
     // Computed styles
     const background: ViewStyle = {
-      backgroundColor: isPressed ? accentInterpolation : surfaceInterpolation,
+      backgroundColor: colorInterpolation,
       borderStyle: 'solid',
       borderBottomWidth: 1,
       borderBottomColor: options?.isWarning
         ? themeColors.warning[300]
         : themeColors.accent[400],
+      borderRadius: 8,
     };
     const textSize = {
       fontSize: options?.largeText ? 24 : 18,
@@ -82,10 +79,6 @@ export const AppButton = React.memo<AppButtonProps>(
           backgroundColor: themeColors.surface4,
         }
       : null;
-    const pressedStyle: ViewStyle = {
-      elevation: 0,
-      backgroundColor: themeColors.accent[500],
-    };
     const appButtonContainer = {
       elevation: 4,
       paddingVertical: 6,
@@ -97,12 +90,10 @@ export const AppButton = React.memo<AppButtonProps>(
       <Pressable
         onPress={onPress}
         onPressIn={() => {
-          setIsPressed(true);
-          animationToAccent();
+          animateToAccent();
         }}
         onPressOut={() => {
-          setIsPressed(false);
-          animationToSurface();
+          animateFromAccent();
         }}
         disabled={options?.disabled}>
         <Animated.View
@@ -112,7 +103,6 @@ export const AppButton = React.memo<AppButtonProps>(
             buttonWidth,
             disabledStyle,
             options?.customStyle,
-            isPressed ? pressedStyle : null,
           ]}>
           <AppButtonText customStyle={textSize}> {title} </AppButtonText>
         </Animated.View>

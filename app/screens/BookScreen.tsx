@@ -78,7 +78,10 @@ export const BookScreen: React.FC<BookScreenNavigationProp> = () => {
         'Cubby',
         'shelves',
       );
-
+      
+      // NOTE: Adding a new book will not initially show the
+      // parent cubby's name. Need a re-render for that to show.
+      // Seems like a bug?
       // Finally, get the book's parent cubby object.
       const bookCubby = results[0];
       setCubby(bookCubby);
@@ -267,6 +270,7 @@ export const BookScreen: React.FC<BookScreenNavigationProp> = () => {
             ? book.categories.map((category: string) => {
                 return (
                   <CategoryLabelElement
+                    key={category}
                     category={category}
                     categoryStyle={categoryLabel}
                   />

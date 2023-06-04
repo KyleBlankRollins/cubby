@@ -31,7 +31,7 @@ const BottomTabs = () => {
         component={HomeStackNavigator}
         options={{
           headerShown: false,
-          tabBarActiveTintColor: themeColors.mainLight,
+          tabBarActiveTintColor: themeColors.accent[400],
           tabBarLabelPosition: 'beside-icon',
           tabBarLabelStyle: textStyle,
           tabBarIcon: ({color, size}) => (
@@ -43,7 +43,7 @@ const BottomTabs = () => {
         name="Find a book"
         component={FindBookScreen}
         options={{
-          tabBarActiveTintColor: themeColors.mainLight,
+          tabBarActiveTintColor: themeColors.accent[400],
           tabBarLabelPosition: 'beside-icon',
           tabBarLabelStyle: textStyle,
           tabBarIcon: ({color, size}) => (
