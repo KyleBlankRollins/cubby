@@ -78,7 +78,7 @@ export const BookScreen: React.FC<BookScreenNavigationProp> = () => {
         'Cubby',
         'shelves',
       );
-      
+
       // NOTE: Adding a new book will not initially show the
       // parent cubby's name. Need a re-render for that to show.
       // Seems like a bug?
@@ -188,6 +188,7 @@ export const BookScreen: React.FC<BookScreenNavigationProp> = () => {
     opacity: 0.9,
     paddingVertical: 8,
     paddingHorizontal: 4,
+    borderRadius: 8,
   };
 
   const titleBlock: ViewStyle = {
