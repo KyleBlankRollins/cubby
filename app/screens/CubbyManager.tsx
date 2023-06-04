@@ -48,21 +48,6 @@ export const CubbyManager: React.FC<HomeScreenNavigationProp> = () => {
           <CubbyList cubbies={cubbies} />
         </View>
       )}
-
-      {cubbies && (
-        <View style={styles.addCubby}>
-          <AppButton
-            onPress={() => {
-              // TODO: Figure out how I messed up the navigation types
-              navigation.navigate('AddCubbyScreen');
-            }}
-            title="Add Cubby"
-            options={{
-              largeText: true,
-            }}
-          />
-        </View>
-      )}
     </View>
   );
 };
