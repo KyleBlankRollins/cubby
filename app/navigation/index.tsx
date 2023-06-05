@@ -13,8 +13,8 @@ const RootNavigator = () => {
     dark: isDarkMode,
     colors: {
       primary: colors.main,
-      background: colors.surface1,
-      card: colors.surface2,
+      background: colors.surface2,
+      card: colors.surface1,
       text: colors.text2,
       border: colors.text2,
       notification: colors.surface2,

@@ -4,9 +4,9 @@ import {StyleSheet} from 'react-native';
 // This allows for easier manipulation to get color variants.
 
 const mainLightColor = {
-  hue: 5,
-  saturation: 16,
-  lightness: 86,
+  hue: 9,
+  saturation: 17,
+  lightness: 92,
 };
 
 const mainDarkColor = {

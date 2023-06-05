@@ -54,7 +54,7 @@ const AddCubbyButton: React.FC<CubbyListHeaderProps> = ({numberOfCubbies}) => {
     flexDirection: 'row',
     // justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: themeColors.surface2,
+    backgroundColor: themeColors.main,
     opacity: 0.9,
     paddingVertical: 16,
     paddingHorizontal: 8,

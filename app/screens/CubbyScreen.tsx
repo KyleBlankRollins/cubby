@@ -57,6 +57,7 @@ const CubbyScreen: React.FC<CubbyScreenNavigationProp> = () => {
   } else {
     return (
       <View style={styles.cubbyContainer}>
+        {/* TODO: Add edit description feature */}
         <AppText>{cubby!.description}</AppText>
         <HorizontalRule />
 

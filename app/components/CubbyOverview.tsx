@@ -46,6 +46,7 @@ export const CubbyOverview = React.memo<CubbyOverviewProps>(({cubby}) => {
           <AppText numberOfLines={3}>{cubby.description}</AppText>
         </View>
       </View>
+      {/* PICK UP HERE: move this and add icon */}
       <View style={styles.infoContainer}>
         <View style={styles.books}>
           <AppText> {numberOfBooks} books </AppText>
