@@ -1,7 +1,6 @@
 import {StyleSheet} from 'react-native';
 
-// Colors defined as objects with HSL values broken into object properties.
-// This allows for easier manipulation to get color variants.
+// Colors defined as objects with HSL values broken into object properties. This allows for easier manipulation to get color variants.
 
 const mainLightColor = {
   hue: 9,
@@ -28,17 +27,6 @@ const warning = {
 // TODO: add spacing and font definitions
 // https://shopify.engineering/5-ways-to-improve-your-react-native-styling-workflow
 
-// const shadow = {
-//   light: {
-//     surfaceShadow: `${mainColor.hue}, 10%, 20%`,
-//     shadowStrength: 0.02,
-//   },
-//   dark: {
-//     surfaceShadow: `${mainColor.hue}, 50%, 3%`,
-//     shadowStrength: 0.8,
-//   },
-// };
-
 const light = {
   main: `hsl(${mainLightColor.hue}, ${mainLightColor.saturation}%, ${mainLightColor.lightness}%)`,
   mainLight: `hsl(${mainLightColor.hue}, ${mainLightColor.saturation}%, ${mainLightColor.lightness}%)`,
@@ -63,12 +51,6 @@ const light = {
     '500': 'hsl(205, 74%, 11%)',
   },
   warning,
-  // shadow: `0 2.8px 2.2px hsl(${shadow.light.surfaceShadow} / ${shadow.light.shadowStrength} + .03)),
-  // 0 6.7px 5.3px hsl(${shadow.light.surfaceShadow} / ${shadow.light.shadowStrength} + .01)),
-  // 0 12.5px 10px hsl(${shadow.light.surfaceShadow} / ${shadow.light.shadowStrength} + .02)),
-  // 0 22.3px 17.9px hsl(${shadow.light.surfaceShadow} / ${shadow.light.shadowStrength} + .02)),
-  // 0 41.8px 33.4px hsl(${shadow.light.surfaceShadow} / ${shadow.light.shadowStrength} + .03)),
-  // 0 100px 80px hsl(${shadow.light.surfaceShadow} / ${shadow.light.shadowStrength})`,
 };
 
 const dark = {
@@ -97,12 +79,6 @@ const dark = {
     '500': 'hsl(205, 74%, 11%)',
   },
   warning,
-  // shadow: `0 2.8px 2.2px hsl(${shadow.dark.surfaceShadow} / ${shadow.dark.shadowStrength} + .03)),
-  // 0 6.7px 5.3px hsl(${shadow.dark.surfaceShadow} / ${shadow.dark.shadowStrength} + .01)),
-  // 0 12.5px 10px hsl(${shadow.dark.surfaceShadow} / ${shadow.dark.shadowStrength} + .02)),
-  // 0 22.3px 17.9px hsl(${shadow.dark.surfaceShadow} / ${shadow.dark.shadowStrength} + .02)),
-  // 0 41.8px 33.4px hsl(${shadow.dark.surfaceShadow} / ${shadow.dark.shadowStrength} + .03)),
-  // 0 100px 80px hsl(${shadow.dark.surfaceShadow} / ${shadow.dark.shadowStrength})`,
 };
 
 const lightStyles = StyleSheet.create({
